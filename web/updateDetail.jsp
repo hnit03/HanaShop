@@ -45,8 +45,12 @@
                                placeholder="Food Name"
                                maxlength="50" />
                         <br/>
-                        <img  src="images/${product.image}" id="image" style="width: 252px; height: 160px;"/>
-                        <div id="displayImg">
+                        
+                        <div class="text-center">
+                            <img  src="images/${product.image}" id="image" style="width: 252px; height: 160px;"/>
+                            <div id="displayImg" >
+
+                            </div>
                         </div>
                         <label class="form-label fontWeight">Choose image:</label>
                         <input type="file" class="form-control-file border"  id="upload" onchange="getImage()"
@@ -116,6 +120,9 @@
                     fileReader.onload = function (fileLoaderEvent) {
                         var srcData = fileLoaderEvent.target.result;
                         var newImage = document.createElement('img');
+                        newImage.style.width = "252px";
+                        newImage.style.height = "160px";
+                        newImage.style.margin = "10px";
                         newImage.src = srcData;
                         document.getElementById("displayImg").innerHTML = newImage.outerHTML;
                         document.getElementById("image").style.display = "none";

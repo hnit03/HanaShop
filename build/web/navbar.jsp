@@ -14,12 +14,10 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
         <link rel="stylesheet" href="css/styles.css">
-        <meta name="google-signin-client_id" 
-              content="406424637817-efgsuneqpjvitod9h0b4b056s1h7ikg1.apps.googleusercontent.com">
     </head>
     <body>
         <nav class="navbar navbar-expand-lg mb20" style="background: white;">
-            <a class="navbar-brand" href="PageServlet">Hana Shop</a>
+            <a class="navbar-brand" href="StartUpServlet">Hana Shop</a>
             <div class="navbar-nav ml-auto" >
                 <c:set var="role" value="${sessionScope.ISADMIN}"/>
                 <c:url var="btnSearch" value="DispatchServlet">

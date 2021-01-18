@@ -7,30 +7,18 @@ package nhinh.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.naming.NamingException;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import nhinh.daos.ProductDAO;
-import nhinh.dtos.ProductDTO;
 
 /**
  *
  * @author PC
  */
-@WebServlet(name = "AdminStartUpServlet", urlPatterns = {"/AdminStartUpServlet"})
-public class AdminStartUpServlet extends HttpServlet {
-
-    private final String START_UP_CONTROLLER = "StartUpServlet";
-    private final String ADMIN_PAGE = "adminPage.jsp";
+@WebServlet(name = "PaginationServlet", urlPatterns = {"/PaginationServlet"})
+public class PaginationServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -45,36 +33,11 @@ public class AdminStartUpServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String url = START_UP_CONTROLLER;
-        try {
+        try{
             /* TODO output your page here. You may use following sample code. */
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                String fullname = (String) session.getAttribute("FULLNAME");
-                if (fullname != null) {
-                    boolean role = (boolean) session.getAttribute("ISADMIN");
-                    if (role) {
-                        String pageNoStr = request.getParameter("pageNo");
-                        int pageNo = 1;
-                        if (pageNoStr != null) {
-                            pageNo = Integer.parseInt(pageNoStr);
-                        }
-                        ProductDAO dao = new ProductDAO();
-                        dao.getAllProducts(pageNo);
-                        List<ProductDTO> result = dao.getProductList();
-                        request.setAttribute("ALLPRODUCT", result);
-                        url = ADMIN_PAGE;
-                    }
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(AdminStartUpServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NamingException ex) {
-            Logger.getLogger(AdminStartUpServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            RequestDispatcher rd = request.getRequestDispatcher(url);
-            rd.forward(request, response);
-            out.close();
+            
+        }finally{
+            
         }
     }
 

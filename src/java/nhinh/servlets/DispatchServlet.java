@@ -22,7 +22,21 @@ import javax.servlet.http.HttpSession;
 public class DispatchServlet extends HttpServlet {
 
     private final String START_UP_CONTROLLER = "StartUpServlet";
+    private final String LOGIN_PAGE = "login.jsp";
     private final String LOGIN_CONTROLLER = "LoginServlet";
+    private final String CREATE_NEW_PRODUCT_CONTROLLER = "CreateNewProductServlet";
+    private final String CREATE_PRODUCT_PAGE = "createNewProduct.jsp";
+    private final String UPDATE_PRODUCT_CONTROLLER = "UpdateProductServlet";
+    private final String GET_PRODUCT_CONTROLLER = "GetProductToUpdateDetailServlet";
+    private final String SEARCH_PRODUCT_PAGE = "searchProduct.jsp";
+    private final String SEARCH_PRODUCT_CONTROLLER = "SearchProductServlet";
+    private final String ADD_PRODUCT_TO_CART_CONTROLLER = "AddProductToCartServlet";
+    private final String PRODUCT_DETAIL_CONTROLLER = "ProductDetailServlet";
+    private final String VIEW_CART_PAGE = "viewCart.jsp";
+    private final String REMOVE_PRODUCT_CONTROLLER = "RemoveProductFromCartServlet";
+    private final String CHECKOUT_CONTROLLER = "CheckoutServlet";
+    private final String LOGOUT_CONTROLLER = "LogoutServlet";
+    private final String PAYMENT_CONTROLLER = "PaymentServlet";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -48,54 +62,51 @@ public class DispatchServlet extends HttpServlet {
                     boolean role = (boolean) session.getAttribute("ISADMIN");
                     if (role) {
                         if ("Create New Product".equals(button)) {
-                            url = "CreateNewProductServlet";
+                            url = CREATE_NEW_PRODUCT_CONTROLLER;
                         } else if ("Create".equals(button)) {
-                            url = "createNewProduct.jsp";
+                            url = CREATE_PRODUCT_PAGE;
                         } else if ("Update".equals(button)) {
-                            url = "UpdateProductServlet";
+                            url = UPDATE_PRODUCT_CONTROLLER;
                         } else if ("Update Detail".equals(button)) {
-                            url = "GetProductToUpdateDetailServlet";
+                            url = GET_PRODUCT_CONTROLLER;
                         } else if ("Save".equals(button)) {
-                            url = "UpdateProductServlet";
+                            url = UPDATE_PRODUCT_CONTROLLER;
                         }
                     }
                     if (!role) {
                         if ("Search Button".equals(button)) {
-                            url = "searchProduct.jsp";
+                            url = SEARCH_PRODUCT_PAGE;
                         } else if ("Search".equals(button)) {
-                            url = "SearchProductServlet";
+                            url = SEARCH_PRODUCT_CONTROLLER;
                         } else if ("Order".equals(button) || "Plus".equals(button)) {
-                            url = "AddProductToCartServlet";
+                            url = ADD_PRODUCT_TO_CART_CONTROLLER;
                         } else if ("More".equals(button)) {
-                            url = "ProductDetailServlet";
+                            url = PRODUCT_DETAIL_CONTROLLER;
                         } else if ("View Cart".equals(button)) {
-                            url = "viewCart.jsp";
+                            url = VIEW_CART_PAGE;
                         } else if ("Remove".equals(button) || "Minus".equals(button)) {
-                            url = "RemoveProductFromCartServlet";
+                            url = REMOVE_PRODUCT_CONTROLLER;
                         } else if ("Checkout".equals(button)) {
-                            url = "CheckoutServlet";
+                            url = CHECKOUT_CONTROLLER;
                         } else if ("Pay".equals(button)) {
-                            url = "PaymentServlet";
+                            url = PAYMENT_CONTROLLER;
                         }
                     }
                 }
                 if ("Search Button".equals(button)) {
-                    url = "searchProduct.jsp";
+                    url = SEARCH_PRODUCT_PAGE;
                 } else if ("Search".equals(button)) {
-                    url = "SearchProductServlet";
+                    url = SEARCH_PRODUCT_CONTROLLER;
                 } else if ("More".equals(button)) {
-                    url = "ProductDetailServlet";
+                    url = PRODUCT_DETAIL_CONTROLLER;
                 } else if ("Login Button".equals(button)) {
-                    url = "login.jsp";
+                    url = LOGIN_PAGE;
                 } else if ("Order".equals(button)) {
-                    url = "AddProductToCartServlet";
-                }
-
-                if (button == null) {
+                    url = ADD_PRODUCT_TO_CART_CONTROLLER;
                 } else if ("Login".equals(button)) {
                     url = LOGIN_CONTROLLER;
                 } else if ("Logout".equals(button)) {
-                    url = "LogoutServlet";
+                    url = LOGOUT_CONTROLLER;
                 }
             }
         } finally {

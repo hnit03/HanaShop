@@ -23,9 +23,36 @@
                 margin-left:auto;
                 margin-right:auto;
             }
+            .loginBtn {
+                box-sizing: border-box;
+                position: relative;
+                width: 13em;
+                margin: 0.2em;
+                padding: 0 0px 0 10px;
+                border: none;
+                text-align: left;
+                line-height: 34px;
+                white-space: nowrap;
+                border-radius: 0.2em;
+                font-size: 16px;
+                color: #FFF;
+            }
+            .loginBtn:focus {
+                outline: none;
+            }
+            .loginBtn:active {
+                box-shadow: inset 0 0 0 32px rgba(0,0,0,0.1);
+            }
+            .loginBtn--google {
+                font-family: "Roboto", Roboto, arial, sans-serif;
+                background: #DD4B39;
+            }
+            .loginBtn--google:hover,
+            .loginBtn--google:focus {
+                background: #E74B37;
+            }
+
         </style>
-        <meta name="google-signin-client_id" 
-              content="406424637817-efgsuneqpjvitod9h0b4b056s1h7ikg1.apps.googleusercontent.com">
     </head>
     <body>
         <jsp:include page="navbar.jsp"/>
@@ -45,46 +72,15 @@
                     <input type="reset" value="Reset" class="btn btn-danger form-control"/>
                 </form>
                 <br>
-                <a href="https://accounts.google.com/o/oauth2/auth?scope=email&redirect_uri=http://localhost:8084/J3LP0013/LoginWithGoogleServlet&response_type=code
-                   &client_id=406424637817-efgsuneqpjvitod9h0b4b056s1h7ikg1.apps.googleusercontent.com&approval_prompt=force">Login With Google</a>
-<!--                <div class="g-signin2" data-onsuccess="onSuccess"></div>-->
-                <br>
-<!--                <script>
-                    function onSignIn(googleUser) {
+                <div class="text-center">
+                    <button class="loginBtn loginBtn--google">
+                        <a href="https://accounts.google.com/o/oauth2/auth?scope=email&redirect_uri=http://localhost:8084/J3LP0013/LoginWithGoogleServlet&response_type=code
+                           &client_id=406424637817-efgsuneqpjvitod9h0b4b056s1h7ikg1.apps.googleusercontent.com&approval_prompt=force" style="color: white;text-decoration: none">
+                            <i class="fab fa-google mr-2"></i> Sign in with Google
+                        </a>
+                    </button>
+                </div>
 
-                        var profile = googleUser.getBasicProfile();
-                        var email = profile.getEmail();
-                        var name = profile.getName();
-                        var id = profile.getId();
-
-                        var xhr = new XMLHttpRequest();
-                        xhr.open('POST', 'http://localhost:8084/J3LP0013/LoginServlet');
-                        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-                        var params = 'txtUserID=' + email + '&name=' + name + '&txtPassword=' + id;
-                        xhr.send(params);
-                        xhr.onload = function () {
-                            window.location.replace('StartUpServlet');
-                        };
-
-                    }
-                    function onLoad() {
-                        gapi.load('auth2,signin2', function () {
-                            var auth2 = gapi.auth2.init();
-                            auth2.then(function () {
-                                // Current values
-                                var isSignedIn = auth2.isSignedIn.get();
-                                console.log(isSignedIn);
-                                if (!isSignedIn) {
-   
-                                    gapi.signin2.render('google-signin-button', {
-                                        'onsuccess': 'onSignIn'
-                                    });
-                                }
-                            });
-                        });
-                    }
-                </script>-->
                 <script src="https://apis.google.com/js/platform.js" async defer></script>
             </div>
         </div>

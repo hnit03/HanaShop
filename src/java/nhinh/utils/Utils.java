@@ -38,8 +38,9 @@ public class Utils {
         OutputStream os = null;
         try {
             File outputFilePath = new File(path + fileName);
-            outputFilePath.createNewFile();
-            System.out.println(outputFilePath.getAbsolutePath());
+            if (!outputFilePath.exists()) {
+                outputFilePath.createNewFile();
+            }
             is = part.getInputStream();
             os = new FileOutputStream(outputFilePath);
             int read = 0;

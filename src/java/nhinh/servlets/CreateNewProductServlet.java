@@ -32,6 +32,9 @@ import nhinh.utils.Utils;
 @WebServlet(name = "CreateNewProductServlet", urlPatterns = {"/CreateNewProductServlet"})
 public class CreateNewProductServlet extends HttpServlet {
 
+    private final String CREATE_PRODUCT_PAGE = "createNewProduct.jsp";
+    private final String ADMIN_START_UP_CONTROLLER = "AdminStartUpServlet";
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -52,14 +55,14 @@ public class CreateNewProductServlet extends HttpServlet {
         String priceStr = request.getParameter("txtPrice");
         String category = request.getParameter("cboCategory");
         String quantityStr = request.getParameter("txtQuantity");
-        String url = "createNewProduct.jsp";
+        String url = CREATE_PRODUCT_PAGE;
         Utils utils = new Utils();
         try {
             ProductDAO pdao = new ProductDAO();
             int productID = pdao.getLastProduct();
             if (productID == 0) {
                 productID = 10000;
-            }else{
+            } else {
                 productID++;
             }
             int quantity = Integer.parseInt(quantityStr);
@@ -72,13 +75,13 @@ public class CreateNewProductServlet extends HttpServlet {
             String createDate = utils.formatDateToString(newDate);
             CategoryDAO cdao = new CategoryDAO();
             CategoryDTO cdto = cdao.getCategoryDTO(category);
-            ProductDTO dto = new ProductDTO(productID,productName, img, description, price, createDate, cdto, true, quantity);
+            ProductDTO dto = new ProductDTO(productID, productName, img, description, price, createDate, cdto, true, quantity);
             boolean isCreate = pdao.createNewProduct(dto);
             if (isCreate) {
                 String realPath = request.getServletContext().getRealPath("/");
                 realPath = realPath + "images/";
                 utils.storeFile(realPath, img, filePart);
-                url = "AdminStartUpServlet";
+                url = ADMIN_START_UP_CONTROLLER;
                 request.setAttribute("CREATE_SUCCESSFULLY", true);
             }
         } catch (SQLException ex) {

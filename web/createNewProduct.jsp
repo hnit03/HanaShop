@@ -47,7 +47,10 @@
                     <input type="file" class="form-control-file border"  id="upload" onchange="getImage()"
                            name="file" required 
                            />
-                    <div id="displayImg">
+                    <div class="text-center">
+                        <div id="displayImg" >
+
+                        </div>
                     </div>
 
                     <label class="form-label fontWeight">Description:</label>
@@ -83,6 +86,7 @@
         </div>
         <script type="text/javascript">
             function getImage() {
+
                 var fileSelected = document.getElementById("upload").files;
                 if (fileSelected.length > 0) {
                     var fileToLoad = fileSelected[0];
@@ -90,9 +94,12 @@
                     fileReader.onload = function (fileLoaderEvent) {
                         var srcData = fileLoaderEvent.target.result;
                         var newImage = document.createElement('img');
+                        newImage.style.width = "252px";
+                        newImage.style.height = "160px";
+                        newImage.style.margin = "10px";
                         newImage.src = srcData;
+                        console.log(newImage.src);
                         document.getElementById("displayImg").innerHTML = newImage.outerHTML;
-                        document.getElementById("image").style.display = "none";
                     }
                     fileReader.readAsDataURL(fileToLoad);
                 }
