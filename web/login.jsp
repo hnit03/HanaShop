@@ -4,6 +4,7 @@
     Author     : PC
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -62,12 +63,18 @@
                 <form action="DispatchServlet" method="POST">
                     <div class="form-group">
                         <label>UserID</label>
-                        <input type="text" name="txtUserID" value="" class="form-control"/>
+                        <input type="text" name="txtUserID" value="${param.txtUserID}" class="form-control" required=""/>
                     </div>
                     <div class="form-group">
                         <label>Password</label>
-                        <input type="password" name="txtPassword" value="" class="form-control"/>
+                        <input type="password" name="txtPassword" value="${param.txtPassword}" class="form-control"/>
                     </div>
+                    <c:set var="error" value="${requestScope.LOGIN_FAILED}"/>
+                    <c:if test="${not empty error}">
+                        <div class="text-center">
+                            <p style="color: red;font-weight: bold">${error}</p>
+                        </div>
+                    </c:if>
                     <input type="submit" value="Login" name="btnAction" class="btn btn-primary form-control"/><br/><br/>
                     <input type="reset" value="Reset" class="btn btn-danger form-control"/>
                 </form>
@@ -80,7 +87,6 @@
                         </a>
                     </button>
                 </div>
-
                 <script src="https://apis.google.com/js/platform.js" async defer></script>
             </div>
         </div>

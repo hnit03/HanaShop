@@ -39,6 +39,7 @@ public class StartUpServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         String url = USER_START_UP_CONTROLLER;
+        int pageNo = 1;
         try {
             /* TODO output your page here. You may use following sample code. */
             HttpSession session = request.getSession(false);
@@ -51,8 +52,10 @@ public class StartUpServlet extends HttpServlet {
                     }
                 }
             }
+            request.setAttribute("PAGENO", pageNo);
         } finally {
-            response.sendRedirect(url);
+            RequestDispatcher rd = request.getRequestDispatcher(url);
+            rd.forward(request, response);
             out.close();
         }
     }

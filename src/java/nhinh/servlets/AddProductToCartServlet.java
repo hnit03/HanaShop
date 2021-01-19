@@ -8,8 +8,6 @@ package nhinh.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -28,7 +26,9 @@ import nhinh.dtos.ProductDTO;
  */
 @WebServlet(name = "AddProductToCartServlet", urlPatterns = {"/AddProductToCartServlet"})
 public class AddProductToCartServlet extends HttpServlet {
-
+    private final String START_UP_CONTROLLER = "StartUpServlet";
+    private final String LOGIN_PAGE = "login.jsp";
+    private final String VIEW_CART_PAGE = "viewCart.jsp";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -42,7 +42,7 @@ public class AddProductToCartServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String url = "login.jsp";
+        String url = LOGIN_PAGE;
         try {
             /* TODO output your page here. You may use following sample code. */
             HttpSession session = request.getSession(false);
@@ -50,7 +50,7 @@ public class AddProductToCartServlet extends HttpServlet {
             if (fullname != null) {
                 boolean isAdmin = (boolean) session.getAttribute("ISADMIN");
                 if (isAdmin) {
-                    url = "StartUpServlet";
+                    url = START_UP_CONTROLLER;
                 } else {
                     CartObject cart = (CartObject) session.getAttribute("CUSTCART");
                     if (cart == null) {
@@ -65,7 +65,7 @@ public class AddProductToCartServlet extends HttpServlet {
                         ProductDTO dto = dao.getProductDTO(productID);
                         if (plus != null) {
                             cart.increaseProductToCart(dto.getProductID());
-                            url = "viewCart.jsp";
+                            url = VIEW_CART_PAGE;
                         } else {
                             if (amountStr != null) {
                                 amount = Integer.parseInt(amountStr);
@@ -73,7 +73,7 @@ public class AddProductToCartServlet extends HttpServlet {
                             cart.addProductToCart(dto, amount);
                             session.setAttribute("CUSTCART", cart);
                             request.setAttribute("ADD_SUCCESS", true);
-                            url = "UserStartUpServlet";
+                            url = START_UP_CONTROLLER;
                         }
 
                     }
@@ -81,9 +81,9 @@ public class AddProductToCartServlet extends HttpServlet {
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(AddProductToCartServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log("AddProductToCart_SQL:"+ex.getMessage());
         } catch (NamingException ex) {
-            Logger.getLogger(AddProductToCartServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log("AddProductToCart_Naming:"+ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

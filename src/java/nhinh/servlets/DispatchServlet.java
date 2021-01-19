@@ -37,6 +37,7 @@ public class DispatchServlet extends HttpServlet {
     private final String CHECKOUT_CONTROLLER = "CheckoutServlet";
     private final String LOGOUT_CONTROLLER = "LogoutServlet";
     private final String PAYMENT_CONTROLLER = "PaymentServlet";
+    private final String PAGINATION_CONTROLLER = "PaginationServlet";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -71,6 +72,10 @@ public class DispatchServlet extends HttpServlet {
                             url = GET_PRODUCT_CONTROLLER;
                         } else if ("Save".equals(button)) {
                             url = UPDATE_PRODUCT_CONTROLLER;
+                        } else if ("Search By Admin Button".equals(button)) {
+                            url = SEARCH_PRODUCT_PAGE;
+                        } else if ("Search By Admin".equals(button)) {
+                            url = SEARCH_PRODUCT_CONTROLLER;
                         }
                     }
                     if (!role) {
@@ -78,7 +83,7 @@ public class DispatchServlet extends HttpServlet {
                             url = SEARCH_PRODUCT_PAGE;
                         } else if ("Search".equals(button)) {
                             url = SEARCH_PRODUCT_CONTROLLER;
-                        } else if ("Order".equals(button) || "Plus".equals(button)) {
+                        } else if ("Add To Cart".equals(button) || "Plus".equals(button)) {
                             url = ADD_PRODUCT_TO_CART_CONTROLLER;
                         } else if ("More".equals(button)) {
                             url = PRODUCT_DETAIL_CONTROLLER;
@@ -90,10 +95,14 @@ public class DispatchServlet extends HttpServlet {
                             url = CHECKOUT_CONTROLLER;
                         } else if ("Pay".equals(button)) {
                             url = PAYMENT_CONTROLLER;
+                        } else if ("Next".equals(button) || "Previous".equals(button)) {
+                            url = PAGINATION_CONTROLLER;
                         }
                     }
                 }
-                if ("Search Button".equals(button)) {
+                if ("".equals(button)) {
+                    url = START_UP_CONTROLLER;
+                } else if ("Search Button".equals(button)) {
                     url = SEARCH_PRODUCT_PAGE;
                 } else if ("Search".equals(button)) {
                     url = SEARCH_PRODUCT_CONTROLLER;
@@ -101,13 +110,16 @@ public class DispatchServlet extends HttpServlet {
                     url = PRODUCT_DETAIL_CONTROLLER;
                 } else if ("Login Button".equals(button)) {
                     url = LOGIN_PAGE;
-                } else if ("Order".equals(button)) {
+                } else if ("Add To Cart".equals(button)) {
                     url = ADD_PRODUCT_TO_CART_CONTROLLER;
                 } else if ("Login".equals(button)) {
                     url = LOGIN_CONTROLLER;
                 } else if ("Logout".equals(button)) {
                     url = LOGOUT_CONTROLLER;
+                } else if ("Next".equals(button) || "Previous".equals(button)) {
+                    url = PAGINATION_CONTROLLER;
                 }
+
             }
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);

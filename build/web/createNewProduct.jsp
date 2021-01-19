@@ -80,6 +80,10 @@
                            maxlength="50" min="0" max="100"/>
                     <div class="text-center" style="margin-top: 20px;">
                         <input type="submit" value="Create New Product" name="btnAction" class="btn btn-primary"  />
+                        <c:url var="cancel" value="DispatchServlet">
+                            <c:param name="btnAction" value=""/>
+                        </c:url>
+                        <a href="${cancel}" class="btn btn-warning">Cancel</a>
                     </div>
                 </form>
             </div>

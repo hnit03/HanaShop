@@ -14,14 +14,14 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <script src="https://www.paypal.com/sdk/js?client-id=AXLQI5MjzuitpwtYOEcXSxE1yKW2EktK_bogWJpQt8XYUomExNBjHJN153ZvlGCSzaUeRwq644KYF0dK"></script>
+        <script src="https://www.paypal.com/sdk/js?client-id=AQw86f13UkME0dpCSBiLcTRc_c2-hEhhGgA1QusoaHS0WWLU0XsJFuR_O1b6HBk5rMfhz63EnV3qNGlC"></script>
 
         <div class="container">
             <jsp:include page="navbar.jsp"/>
 
             <div id="paypal-button-container"></div>
-            <c:set var="cartID" value="${requestScope.cartID}" />
-            <c:set var="totalPayment" value="${sessionScope.totalPayment}" />
+            <c:set var="billID" value="${sessionScope.BILLID}" />
+            <c:set var="totalPayment" value="${sessionScope.TOTAL_PRICE}" />
         </div>
 
 
@@ -41,7 +41,7 @@
                         ,
                         onApprove: function (data, actions) {
                             return actions.order.capture().then(function () {
-                                actions.redirect('http://localhost:8085/HanaShop/PaymentWithPaypal?cartID=${cartID}');
+                                actions.redirect('http://localhost:8084/J3LP0013/PaymentWithPaypalServlet?billID=${billID}');
                             }
                             )
                         }

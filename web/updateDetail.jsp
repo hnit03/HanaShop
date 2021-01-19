@@ -45,7 +45,7 @@
                                placeholder="Food Name"
                                maxlength="50" />
                         <br/>
-                        
+
                         <div class="text-center">
                             <img  src="images/${product.image}" id="image" style="width: 252px; height: 160px;"/>
                             <div id="displayImg" >
@@ -105,6 +105,10 @@
                                 <input type="hidden" name="productID" value="${product.productID}" />
                                 <input type="hidden" name="createDate" value="${product.createDate}" />
                                 <input type="hidden" name="updateDetail" value="true" />
+                                <c:url var="cancel" value="DispatchServlet">
+                                    <c:param name="btnAction" value=""/>
+                                </c:url>
+                                <a href="${cancel}" class="btn btn-warning">Cancel</a>
                             </div>
 
                         </form>

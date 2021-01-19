@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import javax.naming.NamingException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -28,6 +29,7 @@ public class LoginServlet extends HttpServlet {
 
     private final String INVALID = "login.jsp";
     private final String USER_START_UP_CONTROLLER = "UserStartUpServlet";
+    private final String START_UP_CONTROLLER = "StartUpServlet";
     private final String ADMIN_START_UP_CONTROLLER = "AdminStartUpServlet";
 
     /**
@@ -49,35 +51,38 @@ public class LoginServlet extends HttpServlet {
         boolean isAdmin = false;
         try {
             /* TODO output your page here. You may use following sample code. */
-
             RegistrationDAO dao = new RegistrationDAO();
             HttpSession session = request.getSession();
             if (userID != null && password != null) {
                 int role = dao.checkLogin(userID, password);
                 if (role != -1) {
                     if (role == 0) {
-                        url = USER_START_UP_CONTROLLER;
+                        url = START_UP_CONTROLLER;
                         UserDetailsDAO udao = new UserDetailsDAO();
                         UserDetailsDTO udto = udao.getUserDetails(userID);
                         session.setAttribute("USER_DETAILS", udto);
                         session.setAttribute("USERID", userID);
                         isAdmin = false;
                     } else {
-                        url = ADMIN_START_UP_CONTROLLER;
+                        url = START_UP_CONTROLLER;
                         isAdmin = true;
                     }
                     session.setAttribute("USERID", userID);
                     session.setAttribute("FULLNAME", dao.getFullname(userID));
                     session.setAttribute("ISADMIN", isAdmin);
-                } 
+                    response.sendRedirect(url);
+                } else{
+                    request.setAttribute("LOGIN_FAILED", "Invalid userID or password.");
+                    RequestDispatcher rd = request.getRequestDispatcher(url);
+                    rd.forward(request, response);
+                }
             }
-            System.out.println(url);
         } catch (SQLException ex) {
             log("Login_SQLEx: " + ex.getMessage());
         } catch (NamingException ex) {
             log("Login_NamingEx: " + ex.getMessage());
         } finally {
-            response.sendRedirect(url);
+            
             out.close();
         }
     }

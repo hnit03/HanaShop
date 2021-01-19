@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -48,18 +46,20 @@ public class AdminStartUpServlet extends HttpServlet {
         String url = START_UP_CONTROLLER;
         try {
             /* TODO output your page here. You may use following sample code. */
+            
             HttpSession session = request.getSession(false);
             if (session != null) {
                 String fullname = (String) session.getAttribute("FULLNAME");
                 if (fullname != null) {
                     boolean role = (boolean) session.getAttribute("ISADMIN");
                     if (role) {
-                        String pageNoStr = request.getParameter("pageNo");
-                        int pageNo = 1;
-                        if (pageNoStr != null) {
-                            pageNo = Integer.parseInt(pageNoStr);
-                        }
+                        int pageNo = (int) request.getAttribute("PAGENO");
                         ProductDAO dao = new ProductDAO();
+                        int pageMax = dao.getNumberOfPageForAdmin();
+                        request.setAttribute("PAGE_MAX_ADMIN", pageMax);
+                        if (pageNo >= pageMax) {
+                            pageNo = pageMax;
+                        }
                         dao.getAllProducts(pageNo);
                         List<ProductDTO> result = dao.getProductList();
                         request.setAttribute("ALLPRODUCT", result);
@@ -68,9 +68,9 @@ public class AdminStartUpServlet extends HttpServlet {
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(AdminStartUpServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log("AdminStartUp_SQL: "+ex.getMessage() );
         } catch (NamingException ex) {
-            Logger.getLogger(AdminStartUpServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log("AdminStartUp_Naming: "+ex.getMessage() );
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

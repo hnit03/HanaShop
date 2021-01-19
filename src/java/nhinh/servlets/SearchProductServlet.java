@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -18,6 +16,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.ProductDTO;
 
@@ -27,6 +26,9 @@ import nhinh.dtos.ProductDTO;
  */
 @WebServlet(name = "SearchProductServlet", urlPatterns = {"/SearchProductServlet"})
 public class SearchProductServlet extends HttpServlet {
+
+    private final String SEARCH_PAGE = "searchProduct.jsp";
+    private final String ADMIN_SEARCH_PAGE = "searchProductByAdmin.jsp";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -46,8 +48,14 @@ public class SearchProductServlet extends HttpServlet {
         String priceMinStr = request.getParameter("txtPriceMin");
         String priceMaxStr = request.getParameter("txtPriceMax");
         int priceMin = 0;
-        int priceMax = 1000;
+        int priceMax = 10000000;
+        String url = SEARCH_PAGE;
+        int pageNo = 1;
         try {
+            Object pageNumber = (Object) request.getAttribute("PAGENO");
+            if (pageNumber != null) {
+                pageNo = (int) pageNumber;
+            }
             ProductDAO dao = new ProductDAO();
             if (!pName.trim().isEmpty() || !categoryName.equals("--Select Category--") || !priceMinStr.trim().isEmpty() || !priceMaxStr.trim().isEmpty()) {
                 if (!priceMinStr.trim().isEmpty() && priceMinStr != null) {
@@ -56,38 +64,43 @@ public class SearchProductServlet extends HttpServlet {
                 if (!priceMaxStr.trim().isEmpty()) {
                     priceMax = Integer.parseInt(priceMaxStr);
                 }
-                if (!priceMinStr.trim().isEmpty() && !priceMaxStr.trim().isEmpty()) {
-                    if (pName == null && !categoryName.equals("--Select Category--")) {
-                        dao.userSearchProductByPrice(priceMin, priceMax, 1);
-                        List<ProductDTO> result = dao.getProductList();
-                        request.setAttribute("PRODUCTSEARCH", result);
+                if (categoryName.equals("--Select Category--")) {
+                    categoryName = "";
+                }
+
+                HttpSession session = request.getSession(false);
+                String fullname = (String) session.getAttribute("FULLNAME");
+                if (fullname != null) {
+                    boolean isAdmin = (boolean) session.getAttribute("ISADMIN");
+                    if (isAdmin) {
+                        dao.searchProductByAllByAdmin(pName, categoryName, priceMin, priceMax, pageNo);
+                        int pageMax = dao.getNumberOfPageForAdminSearch(pName, categoryName, priceMin, priceMax);
+                        request.setAttribute("PAGE_MAX_ADMIN", pageMax);
+                        url = ADMIN_SEARCH_PAGE;
+                    } else if (!isAdmin) {
+                        dao.searchProductByAll(pName, categoryName, priceMin, priceMax, pageNo);
+                        int pageMax = dao.getNumberOfPageForUserSearch(pName, categoryName, priceMin, priceMax);
+                        request.setAttribute("PAGE_MAX_USER", pageMax);
+                        url = SEARCH_PAGE;
                     }
                 }
-                if (!pName.trim().isEmpty()) {
-                    if (!categoryName.equals("--Select Category--")) {
-                        dao.userSearchProductByAll(pName, categoryName, priceMin, priceMax, 1);
-                        List<ProductDTO> result = dao.getProductList();
-                        request.setAttribute("PRODUCTSEARCH", result);
-                    } else {
-                        dao.userSearchProductByName(pName, priceMin, priceMax, 1);
-                        List<ProductDTO> result = dao.getProductList();
-                        request.setAttribute("PRODUCTSEARCH", result);
-                    }
+                if (fullname == null) {
+                    dao.searchProductByAll(pName, categoryName, priceMin, priceMax, pageNo);
+                    int pageMax = dao.getNumberOfPageForUserSearch(pName, categoryName, priceMin, priceMax);
+                    request.setAttribute("PAGE_MAX_USER", pageMax);
+                    url = SEARCH_PAGE;
                 }
-                if (!categoryName.equals("--Select Category--")) {
-                    if (!pName.trim().isEmpty()) {
-                        dao.userSearchProductByCategory(categoryName, priceMin, priceMax, 1);
-                        List<ProductDTO> result = dao.getProductList();
-                        request.setAttribute("PRODUCTSEARCH", result);
-                    }
-                }
+
+                request.setAttribute("PAGENO", pageNo);
+                List<ProductDTO> result = dao.getProductList();
+                request.setAttribute("PRODUCTSEARCH", result);
             }
+
         } catch (SQLException ex) {
-            Logger.getLogger(SearchProductServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log("Search_SQL: " + ex.getMessage());
         } catch (NamingException ex) {
-            Logger.getLogger(SearchProductServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log("Search_Naming: " + ex.getMessage());
         } finally {
-            String url = "searchProduct.jsp";
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);
             out.close();

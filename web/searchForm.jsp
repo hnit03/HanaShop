@@ -20,9 +20,9 @@
         <div style="background-color: white;
              padding: 20px 100px 20px 100px; margin-bottom: 20px;margin-top: -20px;">
             <form action="DispatchServlet" method="GET" class="d-flex">
-                <label class="nav-link">Name:</label>
+                <label class="nav-link" style="font-weight: bold">Name:</label>
                 <input type="text" class="form-control" placeholder="Name" name="txtSearchValue" value="${param.txtSearchValue}" style="width: 50%;"/>
-                <label class="nav-link">Category:</label>
+                <label class="nav-link" style="font-weight: bold">Category:</label>
                 <select class="form-control" style="width: 50%;" name="cboCategory">
                     <option value="--Select Category--">--Select Category--</option>
                     <c:set var="categoryList" value="${applicationScope.CATEGORY}"/>
@@ -36,7 +36,7 @@
                         </c:forEach>
                     </c:if>
                 </select>
-                <label class="nav-link">Price:</label>
+                <label class="nav-link" style="font-weight: bold">Price:</label>
                 <input type="number" class="form-control" 
                        name="txtPriceMin" 
                        value="${param.txtPriceMin}" 

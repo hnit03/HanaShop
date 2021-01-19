@@ -15,7 +15,6 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
         <link rel="stylesheet" href="css/styles.css">
         <style>
-            /* The Modal (background) */
             .modal {
                 display: none;
                 position: fixed; 
@@ -31,8 +30,6 @@
                 background-color: rgb(0,0,0); 
                 background-color: rgba(0,0,0,0.4); 
             }
-
-            /* Modal Content */
             .modal-content {
                 background-color: #fefefe;
                 margin: auto;

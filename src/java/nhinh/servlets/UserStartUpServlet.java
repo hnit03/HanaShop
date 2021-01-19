@@ -16,7 +16,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.ProductDTO;
 
@@ -26,8 +25,9 @@ import nhinh.dtos.ProductDTO;
  */
 @WebServlet(name = "UserStartUpServlet", urlPatterns = {"/UserStartUpServlet"})
 public class UserStartUpServlet extends HttpServlet {
+
     private final String HOME_PAGE = "index.jsp";
-    private final String START_UP_CONTROLLER = "StartUpServlet";
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -44,16 +44,16 @@ public class UserStartUpServlet extends HttpServlet {
         String url = HOME_PAGE;
         try {
             /* TODO output your page here. You may use following sample code. */
-            String pageNoStr = request.getParameter("pageNo");
-            int pageNo = 1;
-            if (pageNoStr != null) {
-                pageNo = Integer.parseInt(pageNoStr);
-            }
+            int pageNo = (int) request.getAttribute("PAGENO");
             ProductDAO dao = new ProductDAO();
+            int pageMax = dao.getNumberOfPageForUser();
+            request.setAttribute("PAGE_MAX_USER", pageMax);
+            if (pageNo >= pageMax) {
+                pageNo = pageMax;
+            }
             dao.getAllActiveProducts(pageNo);
             List<ProductDTO> result = dao.getProductList();
             request.setAttribute("ALLPRODUCT", result);
-            
         } catch (SQLException ex) {
             log("UserStartUp_SQL: " + ex.getMessage());
         } catch (NamingException ex) {

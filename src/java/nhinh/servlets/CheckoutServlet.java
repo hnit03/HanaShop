@@ -66,6 +66,7 @@ public class CheckoutServlet extends HttpServlet {
                         } else {
                             billID = billID + 1;
                         }
+                        session.setAttribute("BILLID", billID);
                         BillDTO bdto = new BillDTO(billID, userID, totalPrice);
                         session.setAttribute("BILL", bdto);
                         List<BillDetailsDTO> list = new ArrayList<>();

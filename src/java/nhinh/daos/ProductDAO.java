@@ -251,226 +251,7 @@ public class ProductDAO implements Serializable {
         }
     }
 
-    public void userSearchProductByPrice(int priceMin, int priceMax, int pageNo) throws SQLException, NamingException {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            con = DBHelper.makeConnection();
-            if (con != null) {
-                String sql = "select productID,productName,image,description,price,createDate,categoryID,status,quantity "
-                        + "from Product "
-                        + "where price >= ? and price <= ? and status = 1 "
-                        + "ORDER BY createDate ASC "
-                        + "OFFSET ? ROWS "
-                        + "FETCH NEXT ? ROWS ONLY";
-                ps = con.prepareStatement(sql);
-                ps.setInt(1, priceMin);
-                ps.setInt(2, priceMax);
-                int dismissRecord = (pageNo - 1) * RECORDS_IN_PAGE;
-                ps.setInt(3, dismissRecord);
-                ps.setInt(4, RECORDS_IN_PAGE);
-                rs = ps.executeQuery();
-                while (rs.next()) {
-                    int productID = rs.getInt("productID");
-                    String productName = rs.getString("productName");
-                    String image = rs.getString("image");
-                    String description = rs.getString("description");
-                    float price = rs.getFloat("price");
-                    String createDate = rs.getString("createDate");
-                    String categoryID = rs.getString("categoryID");
-                    CategoryDAO dao = new CategoryDAO();
-                    dao.getAllCategory();
-                    CategoryDTO cdto = dao.findCategoryDTO(categoryID);
-                    boolean status = rs.getBoolean("status");
-                    int quantity = rs.getInt("quantity");
-                    ProductDTO dto = new ProductDTO(productID, productName, image, description, price, createDate, cdto, status, quantity);
-                    if (this.productList == null) {
-                        this.productList = new ArrayList<>();
-                    }
-                    this.productList.add(dto);
-                }
-            }
-        } finally {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-            if (con != null) {
-                con.close();
-            }
-        }
-    }
-
-    public void adminSearchProductByPrice(int priceMin, int priceMax, int pageNo) throws SQLException, NamingException {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            con = DBHelper.makeConnection();
-            if (con != null) {
-                String sql = "select productID,productName,image,description,price,createDate,categoryID,status,quantity "
-                        + "from Product "
-                        + "where price >= ? and price <= ? "
-                        + "ORDER BY createDate ASC "
-                        + "OFFSET ? ROWS "
-                        + "FETCH NEXT ? ROWS ONLY";
-                ps = con.prepareStatement(sql);
-                ps.setInt(1, priceMin);
-                ps.setInt(2, priceMax);
-                int dismissRecord = (pageNo - 1) * RECORDS_IN_PAGE;
-                ps.setInt(3, dismissRecord);
-                ps.setInt(4, RECORDS_IN_PAGE);
-                rs = ps.executeQuery();
-                while (rs.next()) {
-                    int productID = rs.getInt("productID");
-                    String productName = rs.getString("productName");
-                    String image = rs.getString("image");
-                    String description = rs.getString("description");
-                    float price = rs.getFloat("price");
-                    String createDate = rs.getString("createDate");
-                    String categoryID = rs.getString("categoryID");
-                    CategoryDAO dao = new CategoryDAO();
-                    dao.getAllCategory();
-                    CategoryDTO cdto = dao.findCategoryDTO(categoryID);
-                    boolean status = rs.getBoolean("status");
-                    int quantity = rs.getInt("quantity");
-                    ProductDTO dto = new ProductDTO(productID, productName, image, description, price, createDate, cdto, status, quantity);
-                    if (this.productList == null) {
-                        this.productList = new ArrayList<>();
-                    }
-                    this.productList.add(dto);
-                }
-            }
-        } finally {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-            if (con != null) {
-                con.close();
-            }
-        }
-    }
-
-    public void userSearchProductByCategory(String categotyName, int priceMin, int priceMax, int pageNo) throws SQLException, NamingException {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            con = DBHelper.makeConnection();
-            if (con != null) {
-                String sql = "select productID,productName,image,description,price,createDate,categoryID,status,quantity "
-                        + "from Product "
-                        + "where categoryID = "
-                        + "(select categoryID from Category where categoryName = ?) "
-                        + "and price >= ? and price <= ? "
-                        + "and status = 1 "
-                        + "ORDER BY createDate ASC"
-                        + "OFFSET ? ROWS "
-                        + "FETCH NEXT ? ROWS ONLY";
-                ps = con.prepareStatement(sql);
-                ps.setString(1, categotyName);
-                ps.setInt(2, priceMin);
-                ps.setInt(3, priceMax);
-                int dismissRecord = (pageNo - 1) * RECORDS_IN_PAGE;
-                ps.setInt(4, dismissRecord);
-                ps.setInt(5, RECORDS_IN_PAGE);
-                rs = ps.executeQuery();
-                while (rs.next()) {
-                    int productID = rs.getInt("productID");
-                    String productName = rs.getString("productName");
-                    String image = rs.getString("image");
-                    String description = rs.getString("description");
-                    float price = rs.getFloat("price");
-                    String createDate = rs.getString("createDate");
-                    String categoryID = rs.getString("categoryID");
-                    CategoryDAO dao = new CategoryDAO();
-                    dao.getAllCategory();
-                    CategoryDTO cdto = dao.findCategoryDTO(categoryID);
-                    boolean status = rs.getBoolean("status");
-                    int quantity = rs.getInt("quantity");
-                    ProductDTO dto = new ProductDTO(productID, productName, image, description, price, createDate, cdto, status, quantity);
-                    if (this.productList == null) {
-                        this.productList = new ArrayList<>();
-                    }
-                    this.productList.add(dto);
-                }
-            }
-        } finally {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-            if (con != null) {
-                con.close();
-            }
-        }
-    }
-
-    public void adminSearchProductByCategory(String categotyName, int priceMin, int priceMax, int pageNo) throws SQLException, NamingException {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            con = DBHelper.makeConnection();
-            if (con != null) {
-                String sql = "select productID,productName,image,description,price,createDate,categoryID,status,quantity "
-                        + "from Product "
-                        + "where categoryID = "
-                        + "(select categoryID from Category where categoryName = ?) "
-                        + "and price >= ? and price <= ? "
-                        + "ORDER BY createDate ASC "
-                        + "OFFSET ? ROWS "
-                        + "FETCH NEXT ? ROWS ONLY";
-                ps = con.prepareStatement(sql);
-                ps.setString(1, categotyName);
-                ps.setInt(2, priceMin);
-                ps.setInt(3, priceMax);
-                int dismissRecord = (pageNo - 1) * RECORDS_IN_PAGE;
-                ps.setInt(4, dismissRecord);
-                ps.setInt(5, RECORDS_IN_PAGE);
-                rs = ps.executeQuery();
-                while (rs.next()) {
-                    int productID = rs.getInt("productID");
-                    String productName = rs.getString("productName");
-                    String image = rs.getString("image");
-                    String description = rs.getString("description");
-                    float price = rs.getFloat("price");
-                    String createDate = rs.getString("createDate");
-                    String categoryID = rs.getString("categoryID");
-                    CategoryDAO dao = new CategoryDAO();
-                    dao.getAllCategory();
-                    CategoryDTO cdto = dao.findCategoryDTO(categoryID);
-                    boolean status = rs.getBoolean("status");
-                    int quantity = rs.getInt("quantity");
-                    ProductDTO dto = new ProductDTO(productID, productName, image, description, price, createDate, cdto, status, quantity);
-                    if (this.productList == null) {
-                        this.productList = new ArrayList<>();
-                    }
-                    this.productList.add(dto);
-                }
-            }
-        } finally {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-            if (con != null) {
-                con.close();
-            }
-        }
-    }
-
-    public void userSearchProductByName(String pName, int priceMin, int priceMax, int pageNo) throws SQLException, NamingException {
+    public void searchProductByAll(String pName, String categoryName, int priceMin, int priceMax, int pageNo) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -480,130 +261,18 @@ public class ProductDAO implements Serializable {
                 String sql = "select productID,productName,image,description,price,createDate,categoryID,status,quantity "
                         + "from Product "
                         + "where productName like ? "
-                        + "and price >= ? and price <= ? "
-                        + "and status = 1 "
-                        + "ORDER BY createDate ASC "
-                        + "OFFSET ? ROWS "
-                        + "FETCH NEXT ? ROWS ONLY";
-                ps = con.prepareStatement(sql);
-                ps.setString(1, "%" + pName + "%");
-                ps.setInt(2, priceMin);
-                ps.setInt(3, priceMax);
-                int dismissRecord = (pageNo - 1) * RECORDS_IN_PAGE;
-                ps.setInt(4, dismissRecord);
-                ps.setInt(5, RECORDS_IN_PAGE);
-                rs = ps.executeQuery();
-                while (rs.next()) {
-                    int productID = rs.getInt("productID");
-                    String productName = rs.getString("productName");
-                    String image = rs.getString("image");
-                    String description = rs.getString("description");
-                    float price = rs.getFloat("price");
-                    String createDate = rs.getString("createDate");
-                    String categoryID = rs.getString("categoryID");
-                    CategoryDAO dao = new CategoryDAO();
-                    dao.getAllCategory();
-                    CategoryDTO cdto = dao.findCategoryDTO(categoryID);
-                    boolean status = rs.getBoolean("status");
-                    int quantity = rs.getInt("quantity");
-                    ProductDTO dto = new ProductDTO(productID, productName, image, description, price, createDate, cdto, status, quantity);
-                    if (this.productList == null) {
-                        this.productList = new ArrayList<>();
-                    }
-                    this.productList.add(dto);
-                }
-            }
-        } finally {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-            if (con != null) {
-                con.close();
-            }
-        }
-    }
-
-    public void adminSearchProductByName(String pName, int priceMin, int priceMax, int pageNo) throws SQLException, NamingException {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            con = DBHelper.makeConnection();
-            if (con != null) {
-                String sql = "select productID,productName,image,description,price,createDate,categoryID,status,quantity "
-                        + "from Product "
-                        + "where productName like ? "
-                        + "and price >= ? and price <= ? "
-                        + "ORDER BY createDate ASC "
-                        + "OFFSET ? ROWS "
-                        + "FETCH NEXT ? ROWS ONLY";
-                ps = con.prepareStatement(sql);
-                ps.setString(1, "%" + pName + "%");
-                ps.setInt(2, priceMin);
-                ps.setInt(3, priceMax);
-                int dismissRecord = (pageNo - 1) * RECORDS_IN_PAGE;
-                ps.setInt(4, dismissRecord);
-                ps.setInt(5, RECORDS_IN_PAGE);
-                rs = ps.executeQuery();
-                while (rs.next()) {
-                    int productID = rs.getInt("productID");
-                    String productName = rs.getString("productName");
-                    String image = rs.getString("image");
-                    String description = rs.getString("description");
-                    float price = rs.getFloat("price");
-                    String createDate = rs.getString("createDate");
-                    String categoryID = rs.getString("categoryID");
-                    CategoryDAO dao = new CategoryDAO();
-                    dao.getAllCategory();
-                    CategoryDTO cdto = dao.findCategoryDTO(categoryID);
-                    boolean status = rs.getBoolean("status");
-                    int quantity = rs.getInt("quantity");
-                    ProductDTO dto = new ProductDTO(productID, productName, image, description, price, createDate, cdto, status, quantity);
-                    if (this.productList == null) {
-                        this.productList = new ArrayList<>();
-                    }
-                    this.productList.add(dto);
-                }
-            }
-        } finally {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-            if (con != null) {
-                con.close();
-            }
-        }
-    }
-
-    public void userSearchProductByAll(String pName, String categotyName, int priceMin, int priceMax, int pageNo) throws SQLException, NamingException {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            con = DBHelper.makeConnection();
-            if (con != null) {
-                String sql = "select productID,productName,image,description,price,createDate,categoryID,status,quantity "
-                        + "from Product "
-                        + "where productName like ? "
-                        + "and categoryID = "
-                        + "(select categoryID from Category where categoryName = ?) "
+                        + "and categoryID in "
+                        + "(select categoryID from Category where categoryName like ?) "
                         + "and price >= ? and price <= ? and status = 1 "
                         + "ORDER BY createDate ASC "
                         + "OFFSET ? ROWS "
                         + "FETCH NEXT ? ROWS ONLY";
                 ps = con.prepareStatement(sql);
                 ps.setString(1, "%" + pName + "%");
-                ps.setString(2, categotyName);
+                ps.setString(2, "%" + categoryName + "%");
                 ps.setInt(3, priceMin);
                 ps.setInt(4, priceMax);
                 int dismissRecord = (pageNo - 1) * RECORDS_IN_PAGE;
-
                 ps.setInt(5, dismissRecord);
                 ps.setInt(6, RECORDS_IN_PAGE);
                 rs = ps.executeQuery();
@@ -640,7 +309,7 @@ public class ProductDAO implements Serializable {
         }
     }
 
-    public void adminSearchProductByAll(String pName, String categotyName, int priceMin, int priceMax, int pageNo) throws SQLException, NamingException {
+    public void searchProductByAllByAdmin(String pName, String categoryName, int priceMin, int priceMax, int pageNo) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -650,15 +319,15 @@ public class ProductDAO implements Serializable {
                 String sql = "select productID,productName,image,description,price,createDate,categoryID,status,quantity "
                         + "from Product "
                         + "where productName like ? "
-                        + "and categoryID = "
-                        + "(select categoryID from Category where categoryName = ?) "
+                        + "and categoryID in "
+                        + "(select categoryID from Category where categoryName like ?) "
                         + "and price >= ? and price <= ? "
                         + "ORDER BY createDate ASC "
                         + "OFFSET ? ROWS "
                         + "FETCH NEXT ? ROWS ONLY";
                 ps = con.prepareStatement(sql);
                 ps.setString(1, "%" + pName + "%");
-                ps.setString(2, categotyName);
+                ps.setString(2, "%" + categoryName + "%");
                 ps.setInt(3, priceMin);
                 ps.setInt(4, priceMax);
                 int dismissRecord = (pageNo - 1) * RECORDS_IN_PAGE;
@@ -668,7 +337,6 @@ public class ProductDAO implements Serializable {
                 rs = ps.executeQuery();
                 while (rs.next()) {
                     int productID = rs.getInt("productID");
-
                     String productName = rs.getString("productName");
                     String image = rs.getString("image");
                     String description = rs.getString("description");
@@ -746,25 +414,15 @@ public class ProductDAO implements Serializable {
                         + "where productID = ?";
                 ps = con.prepareStatement(sql);
                 ps.setString(1, dto.getProductName());
-                System.out.println(dto.getProductName());
                 ps.setString(2, dto.getImage());
-                System.out.println(dto.getImage());
                 ps.setString(3, dto.getDescription());
-                System.out.println(dto.getDescription());
                 ps.setFloat(4, dto.getPrice());
-                System.out.println(dto.getPrice());
                 ps.setString(5, dto.getCreateDate());
-                System.out.println(dto.getCreateDate());
                 ps.setString(6, dto.getCdto().getCategoryID());
-                System.out.println(dto.getCdto().getCategoryID());
                 ps.setBoolean(7, dto.isStatus());
-                System.out.println(dto.isStatus());
                 ps.setInt(8, dto.getQuantity());
-                System.out.println(dto.getQuantity());
                 ps.setInt(9, dto.getProductID());
-                System.out.println(dto.getProductID());
                 int row = ps.executeUpdate();
-                System.out.println("row " + row);
                 if (row > 0) {
                     return true;
                 }
@@ -896,5 +554,151 @@ public class ProductDAO implements Serializable {
             }
         }
         return false;
+    }
+
+    public int getNumberOfPageForUser() throws SQLException, NamingException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        int size = 0;
+        int numofpages = 0;
+        try {
+            con = DBHelper.makeConnection();
+            String sql = "select count(productID) as 'size' "
+                    + "from product "
+                    + "where status = 1 ";
+            if (con != null) {
+                ps = con.prepareStatement(sql);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    size = rs.getInt("size");
+                }
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+            numofpages = (int) Math.ceil(1.0 * size / RECORDS_IN_PAGE);
+        }
+        return numofpages;
+    }
+
+    public int getNumberOfPageForUserSearch(String pName, String categoryName, int priceMin, int priceMax) throws SQLException, NamingException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        int size = 0;
+        int numofpages = 0;
+        try {
+            con = DBHelper.makeConnection();
+            String sql = "select count(productID) as 'size' "
+                    + "from product "
+                    + "where status = 1 and productName like ? "
+                    + "and categoryID in "
+                    + "(select categoryID from Category where categoryName like ?)"
+                    + "and price >= ? and price <= ? ";
+            if (con != null) {
+                ps = con.prepareStatement(sql);
+                ps.setString(1, "%" + pName + "%");
+                ps.setString(2, "%" + categoryName + "%");
+                ps.setInt(3, priceMin);
+                ps.setInt(4, priceMax);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    size = rs.getInt("size");
+                }
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+            numofpages = (int) Math.ceil(1.0 * size / RECORDS_IN_PAGE);
+        }
+        return numofpages;
+    }
+    
+    public int getNumberOfPageForAdmin() throws SQLException, NamingException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        int size = 0;
+        int numofpages = 0;
+        try {
+            con = DBHelper.makeConnection();
+            String sql = "select count(productID) as 'size' "
+                    + "from product ";
+            if (con != null) {
+                ps = con.prepareStatement(sql);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    size = rs.getInt("size");
+                }
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+            numofpages = (int) Math.ceil(1.0 * size / RECORDS_IN_PAGE);
+        }
+        return numofpages;
+    }
+
+    public int getNumberOfPageForAdminSearch(String pName, String categoryName, int priceMin, int priceMax) throws SQLException, NamingException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        int size = 0;
+        int numofpages = 0;
+        try {
+            con = DBHelper.makeConnection();
+            String sql = "select count(productID) as 'size' "
+                    + "from product "
+                    + "where status = 1 and productName like ? "
+                    + "and categoryID in "
+                    + "(select categoryID from Category where categoryName like ?)"
+                    + "and price >= ? and price <= ? ";
+            if (con != null) {
+                ps = con.prepareStatement(sql);
+                ps.setString(1, "%" + pName + "%");
+                ps.setString(2, "%" + categoryName + "%");
+                ps.setInt(3, priceMin);
+                ps.setInt(4, priceMax);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    size = rs.getInt("size");
+                }
+
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+            numofpages = (int) Math.ceil(1.0 * size / RECORDS_IN_PAGE);
+        }
+        return numofpages;
     }
 }

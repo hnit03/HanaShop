@@ -17,6 +17,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.ProductDTO;
 
@@ -26,7 +27,8 @@ import nhinh.dtos.ProductDTO;
  */
 @WebServlet(name = "ProductDetailServlet", urlPatterns = {"/ProductDetailServlet"})
 public class ProductDetailServlet extends HttpServlet {
-
+    private final String START_UP_CONTROLLER = "StartUpServlet";
+    private final String PRODUCT_DETAIL_PAGE = "productDetail.jsp";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -41,20 +43,22 @@ public class ProductDetailServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         String productID = request.getParameter("productID");
-        String url = "StartUpServlet";
+        String url = START_UP_CONTROLLER;
         try {
             /* TODO output your page here. You may use following sample code. */
-            System.out.println(productID);
             if (productID!=null) {
                 ProductDAO dao = new ProductDAO();
                 ProductDTO dto = dao.getProductDTO(productID);
+                if (dto.getQuantity() == 0) {
+                    request.setAttribute("QUANTITY", 0);
+                }
                 request.setAttribute("PRODUCTDETAIL", dto);
-                url = "productDetail.jsp";
+                url = PRODUCT_DETAIL_PAGE;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(ProductDetailServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log("ProductDetail_SQL:"+ex.getMessage());
         } catch (NamingException ex) {
-            Logger.getLogger(ProductDetailServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log("ProductDetail_Naming:"+ex.getMessage());
         }finally{
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

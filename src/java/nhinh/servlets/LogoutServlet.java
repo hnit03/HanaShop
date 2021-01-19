@@ -46,6 +46,7 @@ public class LogoutServlet extends HttpServlet {
                 if (fullname != null) {
                     session.removeAttribute("FULLNAME");
                     session.removeAttribute("ISADMIN");
+                    session.invalidate();
                     url = LOGIN_PAGE;
                 }
 

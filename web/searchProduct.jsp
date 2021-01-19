@@ -48,39 +48,47 @@
                         </c:forEach>
                     </div>
                     <nav aria-label="Page navigation example">
-                        <c:set var="pageNo" value="${requestScope.PAGENO}"/>
-                        <c:set var="pageMax" value="${requestScope.PAGEMAX}"/>
-                        <form action="DispatchServlet">
-                            <ul class="pagination justify-content-end">
-                                <c:if test="${pageNo == 1}">
-                                    <li class="page-item disabled">
-                                        <input type="submit" value="Previous" name="btnAction" class="page-link"/>
-                                    </li>   
-                                </c:if>
-                                <c:if test="${pageNo > 1}">
-                                    <li class="page-item">
-                                        <input type="submit" value="Previous" name="btnAction" class="page-link"/>
-                                    </li>   
-                                </c:if>
-                                <c:if test="${pageNo < pageMax}">
-                                    <li class="page-item">
-                                        <input type="submit" value="Next" name="btnAction" class="page-link"/>
-                                    </li>   
-                                </c:if>   
-                                <c:if test="${pageNo >= pageMax}">
-                                    <li class="page-item disabled">
-                                        <input type="submit" value="Next" name="btnAction" class="page-link"/>
-                                    </li>   
-                                </c:if>
-                                <input type="hidden" name="pageNo" value="${pageNo}" />
-                            </ul>
-                        </form>
+                        <c:set var="pageNo" value="${requestScope.PAGENO}"/>                   
+                        <c:set var="pageMaxUser" value="${requestScope.PAGE_MAX_USER}"/>
+                        <c:if test="${pageMaxUser > 1}">
+                            <form action="DispatchServlet">
+                                <ul class="pagination justify-content-end">
+                                    <c:if test="${pageNo <= 1}">
+                                        <li class="page-item disabled">
+                                            <input type="submit" value="Previous" name="btnAction" class="page-link"/>
+                                        </li>   
+                                    </c:if>
+                                    <c:if test="${pageNo > 1}">
+                                        <li class="page-item">
+                                            <input type="submit" value="Previous" name="btnAction" class="page-link"/>
+                                        </li>   
+                                    </c:if>
+                                    <c:if test="${pageNo < pageMaxUser}">
+                                        <li class="page-item">
+                                            <input type="submit" value="Next" name="btnAction" class="page-link"/>
+                                        </li>   
+                                    </c:if>   
+                                    <c:if test="${pageNo == pageMaxUser}">
+                                        <li class="page-item disabled">
+                                            <input type="submit" value="Next" name="btnAction" class="page-link"/>
+                                        </li>   
+                                    </c:if>
+                                    <input type="hidden" name="pageNo" value="${pageNo}" />
+                                    <input type="hidden" name="pageView" value="searchProduct.jsp" />
+                                    <input type="hidden" name="txtSearchValue" value="${param.txtSearchValue}" />
+                                    <input type="hidden" name="cboCategory" value="${param.cboCategory}" />
+                                    <input type="hidden" name="txtPriceMin" value="${param.txtPriceMin}" />
+                                    <input type="hidden" name="txtPriceMax" value="${param.txtPriceMax}" />
+                                </ul>
+                            </form>
+                        </c:if>
                     </nav>
                 </c:if>
                 <c:if test="${empty productList}">
                     <h2 class="text-center">Not found</h2>
                 </c:if>
-            </c:if> 
+            </c:if>
+
         </div>
     </body>
 </html>
