@@ -85,9 +85,16 @@
                             <c:if test="${not empty listStatus}">
                                 <select name="cboStatus" class="form-control">
                                     <c:if test="${not empty listStatus}">
+                                        <c:set var="active" value="${product.status}"/>
+                                        <c:if test="${active == 'true'}">
+                                            <c:set var="active" value="Active"/>
+                                        </c:if>
+                                        <c:if test="${active == 'false'}">
+                                            <c:set var="active" value="Inactive"/>
+                                        </c:if>
                                         <c:forEach var="status" items="${listStatus}" varStatus="counter">
                                             <option value="${status}"
-                                                    <c:if test="${status == dto.status}">
+                                                    <c:if test="${status == active}">
                                                         selected
                                                     </c:if>
                                                     >${status}</option>

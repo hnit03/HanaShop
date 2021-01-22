@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -85,9 +83,9 @@ public class CreateNewProductServlet extends HttpServlet {
                 request.setAttribute("CREATE_SUCCESSFULLY", true);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(CreateNewProductServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log("CreateNewProduct_SQL:" + ex.getMessage());
         } catch (NamingException ex) {
-            Logger.getLogger(CreateNewProductServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log("CreateNewProduct_Naming:" + ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

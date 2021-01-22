@@ -29,6 +29,7 @@ public class AdminStartUpServlet extends HttpServlet {
 
     private final String START_UP_CONTROLLER = "StartUpServlet";
     private final String ADMIN_PAGE = "adminPage.jsp";
+    private final String ERROR_PAGE = "error.jsp";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -43,34 +44,39 @@ public class AdminStartUpServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String url = START_UP_CONTROLLER;
+        String url = ERROR_PAGE;
         try {
             /* TODO output your page here. You may use following sample code. */
-            
             HttpSession session = request.getSession(false);
-            if (session != null) {
-                String fullname = (String) session.getAttribute("FULLNAME");
-                if (fullname != null) {
-                    boolean role = (boolean) session.getAttribute("ISADMIN");
-                    if (role) {
-                        int pageNo = (int) request.getAttribute("PAGENO");
-                        ProductDAO dao = new ProductDAO();
-                        int pageMax = dao.getNumberOfPageForAdmin();
-                        request.setAttribute("PAGE_MAX_ADMIN", pageMax);
-                        if (pageNo >= pageMax) {
-                            pageNo = pageMax;
-                        }
-                        dao.getAllProducts(pageNo);
-                        List<ProductDTO> result = dao.getProductList();
-                        request.setAttribute("ALLPRODUCT", result);
-                        url = ADMIN_PAGE;
+            String fullname = (String) session.getAttribute("FULLNAME");
+            if (fullname != null) {
+                boolean role = (boolean) session.getAttribute("ISADMIN");
+                if (role) {
+                    int pageNo = 1;
+                    Object pageNoObj = request.getAttribute("PAGENO");
+                    if (pageNoObj!=null) {
+                        pageNo = (int) pageNoObj;
                     }
+                    ProductDAO dao = new ProductDAO();
+                    int pageMax = dao.getNumberOfPageForAdmin();
+                    request.setAttribute("PAGE_MAX_ADMIN", pageMax);
+                    if (pageNo >= pageMax) {
+                        pageNo = pageMax;
+                    }
+                    dao.getAllProducts(pageNo);
+                    List<ProductDTO> result = dao.getProductList();
+                    request.setAttribute("ALLPRODUCT", result);
+
+                    url = ADMIN_PAGE;
                 }
+            }else{
+                url = START_UP_CONTROLLER;
             }
+
         } catch (SQLException ex) {
-            log("AdminStartUp_SQL: "+ex.getMessage() );
+            log("AdminStartUp_SQL: " + ex.getMessage());
         } catch (NamingException ex) {
-            log("AdminStartUp_Naming: "+ex.getMessage() );
+            log("AdminStartUp_Naming: " + ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

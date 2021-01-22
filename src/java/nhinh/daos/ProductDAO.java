@@ -11,7 +11,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.naming.NamingException;
 import nhinh.dtos.CategoryDTO;
 import nhinh.dtos.ProductDTO;
@@ -38,7 +40,7 @@ public class ProductDAO implements Serializable {
         try {
             con = DBHelper.makeConnection();
             if (con != null) {
-                String sql = "select productID "
+                String sql = "select top 1 productID "
                         + "from Product "
                         + "order by productID desc";
                 ps = con.prepareStatement(sql);
@@ -62,7 +64,7 @@ public class ProductDAO implements Serializable {
         return productID;
     }
 
-    public ProductDTO getProductDTO(String pID) throws SQLException, NamingException {
+    public ProductDTO getProductDTO(int pID) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -74,7 +76,7 @@ public class ProductDAO implements Serializable {
                         + "from Product "
                         + "where productID = ? and status = 1 ";
                 ps = con.prepareStatement(sql);
-                ps.setString(1, pID);
+                ps.setInt(1, pID);
                 rs = ps.executeQuery();
                 while (rs.next()) {
                     int productID = rs.getInt("productID");
@@ -218,6 +220,9 @@ public class ProductDAO implements Serializable {
                 ps.setInt(1, dismissRecord);
                 ps.setInt(2, RECORDS_IN_PAGE);
                 rs = ps.executeQuery();
+                if (this.productList == null) {
+                    this.productList = new ArrayList<>();
+                }
                 while (rs.next()) {
                     int productID = rs.getInt("productID");
                     String productName = rs.getString("productName");
@@ -232,9 +237,6 @@ public class ProductDAO implements Serializable {
                     boolean status = rs.getBoolean("status");
                     int quantity = rs.getInt("quantity");
                     ProductDTO dto = new ProductDTO(productID, productName, image, description, price, createDate, cdto, status, quantity);
-                    if (this.productList == null) {
-                        this.productList = new ArrayList<>();
-                    }
                     this.productList.add(dto);
                 }
             }
@@ -438,20 +440,20 @@ public class ProductDAO implements Serializable {
         return false;
     }
 
-    public int getQuantityProduct(String productName)
+    public int getQuantityProduct(int productID)
             throws NamingException, SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         String sql = "select Quantity from Product "
-                + "where productName=?";
+                + "where productID=?";
         try {
             con = DBHelper.makeConnection();
 
             if (con != null) {
                 ps = con.prepareStatement(sql);
-                ps.setString(1, productName);
+                ps.setInt(1, productID);
                 rs = ps.executeQuery();
                 if (rs.next()) {
                     return rs.getInt("Quantity");
@@ -471,7 +473,7 @@ public class ProductDAO implements Serializable {
         return -1;
     }
 
-    public boolean updateQuantity(String productName, int decrease) throws SQLException, NamingException {
+    public boolean updateQuantity(int productID, int decrease) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         try {
@@ -479,11 +481,11 @@ public class ProductDAO implements Serializable {
             if (con != null) {
                 String sql = "update Product "
                         + "set quantity = ? "
-                        + "where productName = ?";
+                        + "where productID = ?";
                 ps = con.prepareStatement(sql);
-                int totalQuantity = getQuantityProduct(productName);
+                int totalQuantity = getQuantityProduct(productID);
                 ps.setInt(1, (totalQuantity - decrease));
-                ps.setString(2, productName);
+                ps.setInt(2, productID);
                 int row = ps.executeUpdate();
                 if (row > 0) {
                     return true;
@@ -500,19 +502,45 @@ public class ProductDAO implements Serializable {
         return false;
     }
 
-    public boolean updateQuickly(int productID, String categoryID, boolean status) throws SQLException, NamingException {
+    public boolean updateCategory(int productID, String categoryID) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         try {
             con = DBHelper.makeConnection();
             if (con != null) {
                 String sql = "update Product "
-                        + "set categoryID = ?, status = ? "
+                        + "set categoryID = ? "
                         + "where productID = ?";
                 ps = con.prepareStatement(sql);
                 ps.setString(1, categoryID);
-                ps.setBoolean(2, status);
-                ps.setInt(3, productID);
+                ps.setInt(2, productID);
+                int row = ps.executeUpdate();
+                if (row > 0) {
+                    return true;
+                }
+            }
+        } finally {
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        }
+        return false;
+    }
+    public boolean updateStatus(int productID, boolean status) throws SQLException, NamingException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = DBHelper.makeConnection();
+            if (con != null) {
+                String sql = "update Product "
+                        + "set  status = ? "
+                        + "where productID = ?";
+                ps = con.prepareStatement(sql);
+                ps.setBoolean(1, status);
+                ps.setInt(2, productID);
                 int row = ps.executeUpdate();
                 if (row > 0) {
                     return true;
@@ -628,7 +656,7 @@ public class ProductDAO implements Serializable {
         }
         return numofpages;
     }
-    
+
     public int getNumberOfPageForAdmin() throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
@@ -700,5 +728,152 @@ public class ProductDAO implements Serializable {
             numofpages = (int) Math.ceil(1.0 * size / RECORDS_IN_PAGE);
         }
         return numofpages;
+    }
+
+    public ProductDTO getProductRecommendation(int productID) throws SQLException, NamingException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ProductDTO dto = null;
+        try {
+            con = DBHelper.makeConnection();
+            String sql = "select productID "
+                    + "from Product "
+                    + "where productID != ? and productId in "
+                    + "	(select productID "
+                    + "	from BillDetails "
+                    + "	where billID = "
+                    + "		(select top 1 b.billID "
+                    + "		from Bill b, BillDetails bd "
+                    + "		where b.numOfProduct > 1 and bd.productID = ? "
+                    + "		order by b.BillID desc "
+                    + "		) "
+                    + "	)";
+            if (con != null) {
+                ps = con.prepareStatement(sql);
+                ps.setInt(1, productID);
+                ps.setInt(2, productID);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    int pID = rs.getInt("productID");
+                    dto = getProductDTO(pID);
+                }
+
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        }
+        return dto;
+    }
+
+    public Map<ProductDTO, String> getShoppingHistory(String userID) throws SQLException, NamingException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Map<ProductDTO, String> list = null;
+        try {
+            con = DBHelper.makeConnection();
+            String sql = "select top(100) percent p.productID,p.productName,p.image,p.price,p.categoryID , b.orderTime "
+                    + "from Product p, Bill b, (select bd.productID, r.orderTime "
+                    + "	from BillDetails bd, (select billId , orderTime "
+                    + "		from Bill "
+                    + "		where userID =  ? ) r "
+                    + "	where bd.BillID = r.BillID  ) r "
+                    + "where p.productID  = r.productID  and r.orderTime = b.orderTime "
+                    + "order by b.billID desc";
+            if (con != null) {
+                ps = con.prepareStatement(sql);
+                ps.setString(1, userID);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    int pID = rs.getInt("productID");
+                    String productName = rs.getString("productName");
+                    String image = rs.getString("image");
+                    float price = rs.getFloat("price");
+                    String categoryID = rs.getString("categoryID");
+                    CategoryDAO cdao = new CategoryDAO();
+                    cdao.getAllCategory();
+                    CategoryDTO cdto = cdao.findCategoryDTO(categoryID);
+                    String orderTime = rs.getString("orderTime");
+                    ProductDTO pdto = new ProductDTO(pID, productName, image, price, cdto);
+                    if (list == null) {
+                        list = new LinkedHashMap<>();
+                    }
+                    list.put(pdto, orderTime);
+                }
+
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        }
+        return list;
+    }
+    public Map<ProductDTO, String> searchShoppingHistory(String userID, String name, String date) throws SQLException, NamingException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Map<ProductDTO, String> list = null;
+        try {
+            con = DBHelper.makeConnection();
+            String sql = "select top(100) percent p.productID,p.productName,p.image,p.price,p.categoryID , b.orderTime "
+                    + "from Product p, Bill b, (select bd.productID, r.orderTime "
+                    + "	from BillDetails bd, (select billId , orderTime "
+                    + "		from Bill "
+                    + "		where userID =  ? and orderTime like ? ) r "
+                    + "	where bd.BillID = r.BillID  ) r "
+                    + "where p.productID  = r.productID  and r.orderTime = b.orderTime and p.productName like ? "
+                    + "order by b.billID desc";
+            if (con != null) {
+                ps = con.prepareStatement(sql);
+                ps.setString(1, userID);
+                ps.setString(2, "%"+ date+"%");
+                ps.setString(3, "%"+name+"%");
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    int pID = rs.getInt("productID");
+                    String productName = rs.getString("productName");
+                    String image = rs.getString("image");
+                    float price = rs.getFloat("price");
+                    String categoryID = rs.getString("categoryID");
+                    CategoryDAO cdao = new CategoryDAO();
+                    cdao.getAllCategory();
+                    CategoryDTO cdto = cdao.findCategoryDTO(categoryID);
+                    String orderTime = rs.getString("orderTime");
+                    ProductDTO pdto = new ProductDTO(pID, productName, image, price, cdto);
+                    if (list == null) {
+                        list = new LinkedHashMap<>();
+                    }
+                    list.put(pdto, orderTime);
+                }
+
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        }
+        return list;
     }
 }

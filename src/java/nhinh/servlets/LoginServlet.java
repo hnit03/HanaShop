@@ -28,9 +28,7 @@ import nhinh.dtos.UserDetailsDTO;
 public class LoginServlet extends HttpServlet {
 
     private final String INVALID = "login.jsp";
-    private final String USER_START_UP_CONTROLLER = "UserStartUpServlet";
     private final String START_UP_CONTROLLER = "StartUpServlet";
-    private final String ADMIN_START_UP_CONTROLLER = "AdminStartUpServlet";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -61,7 +59,6 @@ public class LoginServlet extends HttpServlet {
                         UserDetailsDAO udao = new UserDetailsDAO();
                         UserDetailsDTO udto = udao.getUserDetails(userID);
                         session.setAttribute("USER_DETAILS", udto);
-                        session.setAttribute("USERID", userID);
                         isAdmin = false;
                     } else {
                         url = START_UP_CONTROLLER;

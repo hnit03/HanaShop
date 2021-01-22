@@ -18,22 +18,18 @@ import nhinh.utils.DBHelper;
  */
 public class BillDetailsDAO implements Serializable{
     public boolean insertBillDetails(int billID, int productID, int quantity) throws SQLException, NamingException {
-        //1.connect DB
         Connection con = null;
         PreparedStatement ps = null;
 
         try {
             con = DBHelper.makeConnection();
-            //2.tao lenh truy vna61
             if (con != null) {
                 String sql = "insert into BillDetails(BillID,productID,Quantity) "
                         + "values(?,?,?)";
-                //3.tao doi tuong thuc hien truy van (PrepareST)
                 ps = con.prepareStatement(sql);
                 ps.setInt(1, billID);
                 ps.setInt(2, productID);
                 ps.setInt(3, quantity);
-                //4.execute
                 int row = ps.executeUpdate();
                 if (row > 0) {
                     return true;

@@ -26,9 +26,12 @@ import nhinh.dtos.ProductDTO;
  */
 @WebServlet(name = "AddProductToCartServlet", urlPatterns = {"/AddProductToCartServlet"})
 public class AddProductToCartServlet extends HttpServlet {
+
     private final String START_UP_CONTROLLER = "StartUpServlet";
     private final String LOGIN_PAGE = "login.jsp";
     private final String VIEW_CART_PAGE = "viewCart.jsp";
+    private final String ERROR_PAGE = "error.jsp";
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -42,48 +45,90 @@ public class AddProductToCartServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String url = LOGIN_PAGE;
+        String productIDStr = request.getParameter("productID");
+        String amountStr = request.getParameter("txtAmount");
+        String url = ERROR_PAGE;
+        int amount = 0;
+        int numOfProduct = 0;
         try {
             /* TODO output your page here. You may use following sample code. */
-            HttpSession session = request.getSession(false);
-            String fullname = (String) session.getAttribute("FULLNAME");
-            if (fullname != null) {
-                boolean isAdmin = (boolean) session.getAttribute("ISADMIN");
-                if (isAdmin) {
-                    url = START_UP_CONTROLLER;
-                } else {
-                    CartObject cart = (CartObject) session.getAttribute("CUSTCART");
-                    if (cart == null) {
-                        cart = new CartObject();
-                    }
-                    String productID = request.getParameter("productID");
-                    String amountStr = request.getParameter("txtAmount");
-                    String plus = request.getParameter("plus");
-                    int amount = 0;
-                    if (productID != null) {
-                        ProductDAO dao = new ProductDAO();
-                        ProductDTO dto = dao.getProductDTO(productID);
-                        if (plus != null) {
-                            cart.increaseProductToCart(dto.getProductID());
-                            url = VIEW_CART_PAGE;
-                        } else {
-                            if (amountStr != null) {
-                                amount = Integer.parseInt(amountStr);
-                            }
-                            cart.addProductToCart(dto, amount);
-                            session.setAttribute("CUSTCART", cart);
-                            request.setAttribute("ADD_SUCCESS", true);
-                            url = START_UP_CONTROLLER;
+            if (productIDStr != null) {
+                int productID = Integer.parseInt(productIDStr);
+                if (amountStr != null && amountStr.matches("[0-9]+")) {
+                    amount = Integer.parseInt(amountStr);
+                }
+                HttpSession session = request.getSession(false);
+                String fullname = (String) session.getAttribute("FULLNAME");
+                if (fullname != null) {
+                    ProductDAO dao = new ProductDAO();
+                    ProductDTO dto = dao.getProductDTO(productID);
+                    int quantityInStock = dao.getQuantityProduct(productID);
+                    boolean isAdmin = (boolean) session.getAttribute("ISADMIN");
+                    if (isAdmin) {
+                        url = START_UP_CONTROLLER;
+                    } else {
+                        CartObject cart = (CartObject) session.getAttribute("CUSTCART");
+                        Object temp = (Object) session.getAttribute("NUM_OF_PRODUCT");
+                        if (temp !=null) {
+                            numOfProduct = (int) temp;
                         }
+                        if (cart == null) {
+                            cart = new CartObject();
+                            if (amount <= quantityInStock) {
+                                cart.addProductToCart(dto, amount);
+                                session.setAttribute("CUSTCART", cart);
+                                request.setAttribute("ADD_SUCCESS", true);
+                                numOfProduct += 1;
+                                session.setAttribute("NUM_OF_PRODUCT", numOfProduct);
+                                url = START_UP_CONTROLLER;
+                            }
+                        } else {
+                            String plus = request.getParameter("plus");
+                            int quantity = 0;
+                            for (ProductDTO pdto : cart.getProducts().keySet()) {
+                                if (productID == pdto.getProductID()) {
+                                    quantity = cart.getProducts().get(pdto);
+                                    break;
+                                }
+                            }
 
+                            if (quantity > quantityInStock) {
+                                request.setAttribute("OUT_OF_STOCK", "true");
+                                request.setAttribute("QUANTITY_IN_STOCK", quantityInStock);
+                                for (ProductDTO pdto : cart.getProducts().keySet()) {
+                                    if (productID == pdto.getProductID()) {
+                                        cart.getProducts().replace(pdto, quantityInStock);
+                                        break;
+                                    }
+                                }
+
+                                url = VIEW_CART_PAGE;
+                            } else {
+                                if (plus != null) {
+                                    cart.increaseProductToCart(dto.getProductID());
+                                    url = VIEW_CART_PAGE;
+                                } else {
+                                    if (amount <= quantityInStock) {
+                                        cart.addProductToCart(dto, amount);
+                                        session.setAttribute("CUSTCART", cart);
+                                        request.setAttribute("ADD_SUCCESS", true);
+                                        numOfProduct += 1;
+                                        session.setAttribute("NUM_OF_PRODUCT", numOfProduct);
+                                        url = START_UP_CONTROLLER;
+                                    }
+                                }
+                            }
+                        }
                     }
-                    
+
+                } else {
+                    url = LOGIN_PAGE;
                 }
             }
         } catch (SQLException ex) {
-            log("AddProductToCart_SQL:"+ex.getMessage());
+            log("AddProductToCart_SQL:" + ex.getMessage());
         } catch (NamingException ex) {
-            log("AddProductToCart_Naming:"+ex.getMessage());
+            log("AddProductToCart_Naming:" + ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

@@ -3,12 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/web/pagination.jsp</file>
-            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/web/searchProduct.jsp</file>
-            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/src/java/nhinh/daos/ProductDAO.java</file>
-            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/web/adminPage.jsp</file>
-            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/web/adminPagination.jsp</file>
-            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/src/java/nhinh/servlets/SearchProductServlet.java</file>
+            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/src/java/nhinh/servlets/UpdateProductServlet.java</file>
+            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/src/java/nhinh/servlets/ProductHistoryServlet.java</file>
+            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/src/java/nhinh/servlets/PaymentWithPaypalServlet.java</file>
+            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/src/java/nhinh/servlets/CreateNewProductServlet.java</file>
+            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/src/java/nhinh/utils/Utils.java</file>
+            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/src/java/nhinh/servlets/PaymentByCastServlet.java</file>
+            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/src/java/nhinh/dtos/ProductHistoryDTO.java</file>
+            <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/web/paypalWithPaypal.jsp</file>
             <file>file:/D:/FPT%20Semester%205%20Spring%202021/Tai%20Lieu%20Lab%20Web/J3LP0013/src/java/nhinh/servlets/DispatchServlet.java</file>
         </group>
     </open-files>

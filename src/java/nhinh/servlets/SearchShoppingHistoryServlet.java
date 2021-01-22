@@ -7,19 +7,30 @@ package nhinh.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import nhinh.daos.ProductDAO;
+import nhinh.dtos.ProductDTO;
 
 /**
  *
  * @author PC
  */
-@WebServlet(name = "PageViewServlet", urlPatterns = {"/PageViewServlet"})
-public class PageViewServlet extends HttpServlet {
+@WebServlet(name = "SearchShoppingHistoryServlet", urlPatterns = {"/SearchShoppingHistoryServlet"})
+public class SearchShoppingHistoryServlet extends HttpServlet {
+
+    private final String START_UP_CONTROLLER = "StartUpServlet";
+    private final String SEARCH_HISTORY_PAGE = "searchHistory.jsp";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,15 +44,38 @@ public class PageViewServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String url ="";
+        PrintWriter out = response.getWriter();
+        String url = START_UP_CONTROLLER;
         try {
             /* TODO output your page here. You may use following sample code. */
-            String pageView = request.getParameter("pageView");
-            if (pageView.equals("adminSearch")) {
+            String name = request.getParameter("txtSearchName");
+            String date = request.getParameter("date");
+            System.out.println(date + "111");
+            if (!name.trim().isEmpty() || !date.isEmpty()) {
+                HttpSession session = request.getSession(false);
+                Object roleObj = session.getAttribute("ISADMIN");
+                if (roleObj != null) {
+                    boolean role = (boolean) roleObj;
+                    if (!role) {
+                        Object userIDObj = session.getAttribute("USERID");
+                        if (userIDObj != null) {
+                            String userID = (String) userIDObj;
+                            ProductDAO dao = new ProductDAO();
+                            Map<ProductDTO,String> result = dao.searchShoppingHistory(userID, name, date);
+                            request.setAttribute("SEARCH_HISTORY", result);
+                            url = SEARCH_HISTORY_PAGE;
+                        }
+                    }
+                }
             }
-        }finally{
+        } catch (SQLException ex) {
+            Logger.getLogger(SearchShoppingHistoryServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NamingException ex) {
+            Logger.getLogger(SearchShoppingHistoryServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);
+            out.close();
         }
     }
 

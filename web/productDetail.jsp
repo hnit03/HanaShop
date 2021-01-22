@@ -57,8 +57,7 @@
                             </c:if>
                             <br>
                             <input type="hidden" name="productID" value="${product.productID}"/>
-                            <input type="hidden" name="txtAmount" value="${number}">
-                            <c:if test="${requestScope.QUANTITY eq '0'}">
+                            <c:if test="${requestScope.QUANTITY <= '0'}">
                                 <a class="btn btn-danger" style="width: 250px;">Out Of Stock</a>
                             </c:if>
                             <c:if test="${requestScope.QUANTITY != '0'}">
@@ -67,6 +66,31 @@
                         </form>
                     </div>
                 </div>
+                            <br/>
+                <c:set var="productRe" value="${requestScope.PRODUCT_RECOMMENDATION}"/>
+                <c:if test="${not empty productRe}">
+                    <c:url var="moreButton" value="DispatchServlet">
+                            <c:param name="btnAction" value="More"/>
+                            <c:param name="productID" value="${productRe.productID}"/>
+                        </c:url>
+                    <div class="row" style="margin: 20px;">
+                        <div class="col-lg-7" style="border: 2px dotted #ecf0f1">
+                            <h4>Product Recommendation</h4>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <img src="images/${productRe.image}" style="width: 200px; height: 160px;margin: 10px;"/>
+                                </div>
+                                <div class="col-lg-4" style="margin: 20px">
+                                    <h5>${productRe.productName}</h5>
+                                    <p><span style="font-weight: bold">Price:</span> ${productRe.price}</p>
+                                </div>
+                                <div class="col-lg-3" style="margin-top: 80px;">
+                                    <a class="btn btn-danger" href="${moreButton}">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
             </c:if>
         </div>   
         <script>

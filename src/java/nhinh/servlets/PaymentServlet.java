@@ -7,23 +7,29 @@ package nhinh.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import javax.naming.NamingException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import nhinh.cart.CartObject;
 import nhinh.daos.BillDAO;
 import nhinh.daos.BillDetailsDAO;
+import nhinh.daos.ProductDAO;
 import nhinh.daos.UserDetailsDAO;
 import nhinh.dtos.BillDTO;
 import nhinh.dtos.BillDetailsDTO;
+import nhinh.dtos.ProductDTO;
 import nhinh.dtos.UserDetailsDTO;
+import nhinh.utils.Utils;
 
 /**
  *
@@ -31,6 +37,9 @@ import nhinh.dtos.UserDetailsDTO;
  */
 @WebServlet(name = "PaymentServlet", urlPatterns = {"/PaymentServlet"})
 public class PaymentServlet extends HttpServlet {
+
+    private final String ERROR_PAGE = "error.jsp";
+    private final String PAYMENT_SUCCESS_PAGE = "paymentSuccess.jsp";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -45,50 +54,42 @@ public class PaymentServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
+        String url = ERROR_PAGE;
+        int numOfProduct = 1;
+        Date dateTime = new Date();
         try {
             /* TODO output your page here. You may use following sample code. */
-            String paymentMethod = request.getParameter("cboMethod");
-            if (paymentMethod.equals("Momo")) {
-//                url = "paymentWithMomo.jsp";
-            } else {
-                String fullname = request.getParameter("txtFullnameInfo");
-                String phoneStr = request.getParameter("txtPhone");
-                String address = request.getParameter("txtAddress");
-                HttpSession session = request.getSession(false);
-                if (session != null) {
-                    int phone = Integer.parseInt(phoneStr);
-                    BillDTO billDTO = (BillDTO) session.getAttribute("BILL");
-                    String userID = (String) session.getAttribute("USERID");
-                    UserDetailsDAO uddao = new UserDetailsDAO();
-                    int id = uddao.getLastIDFromUD();
-                    if (id < 0) {
-                        id = 10000;
-                    } else {
-                        id = id + 1;
-                    }
-                    UserDetailsDTO uddto = new UserDetailsDTO(id, userID, fullname, phone, address);
-                    uddao.insertUserDetails(uddto);
-                    if (billDTO != null) {
-                        BillDAO bdao = new BillDAO();
-                        bdao.insertBill(billDTO.getBillID(), userID, billDTO.getTotalPrice());
-                        List<BillDetailsDTO> list = (List<BillDetailsDTO>) session.getAttribute("BILL_LIST");
-                        if (list != null) {
-                            BillDetailsDAO bddao = new BillDetailsDAO();
-                            for (BillDetailsDTO dto : list) {
-                                bddao.insertBillDetails(dto.getBillID(), dto.getProductID(), dto.getQuantity());
-                            }
-                            session.removeAttribute("CUSTCART");
+
+            HttpSession session = request.getSession(false);
+            Object roleObject = session.getAttribute("ISADMIN");
+            if (roleObject != null) {
+                boolean role = (boolean) roleObject;
+                if (!role) {
+                    String paymentMethod = request.getParameter("paymentMethod");
+                    String fullname = request.getParameter("txtFullnameInfo");
+                    String phoneStr = request.getParameter("txtPhone");
+                    String address = request.getParameter("txtAddress");
+                    String totalPriceStr = request.getParameter("txtTotalPrice");
+                    if (paymentMethod != null) {
+                        if (paymentMethod.equals("Cash")) {
+                            request.setAttribute("FULLNAME_PAYMENT_REQ", fullname);
+                            request.setAttribute("PHONE_PAYMENT_REQ", phoneStr);
+                            request.setAttribute("ADDRESS_PAYMENT_REQ", address);
+                            request.setAttribute("TOTAL_PRICE_PAYMENT_REQ", totalPriceStr);
+                            url = "PaymentByCastServlet";
+                        } else if (paymentMethod.equals("Paypal")) {
+                            session.setAttribute("FULLNAME_PAYMENT_SS", fullname);
+                            session.setAttribute("PHONE_PAYMENT_SS", phoneStr);
+                            session.setAttribute("ADDRESS_PAYMENT_SS", address);
+                            session.setAttribute("TOTAL_PRICE_PAYMENT_SS", totalPriceStr);
+                            url = "paypalWithPaypal.jsp";
                         }
                     }
                 }
             }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(PaymentServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NamingException ex) {
-            Logger.getLogger(PaymentServlet.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            response.sendRedirect("StartUpServlet");
+            RequestDispatcher rd = request.getRequestDispatcher(url);
+            rd.forward(request, response);
             out.close();
         }
     }

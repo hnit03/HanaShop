@@ -8,8 +8,6 @@ package nhinh.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -17,7 +15,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.ProductDTO;
 
@@ -28,7 +25,7 @@ import nhinh.dtos.ProductDTO;
 @WebServlet(name = "ProductDetailServlet", urlPatterns = {"/ProductDetailServlet"})
 public class ProductDetailServlet extends HttpServlet {
     private final String START_UP_CONTROLLER = "StartUpServlet";
-    private final String PRODUCT_DETAIL_PAGE = "productDetail.jsp";
+    private final String PRODUCT_RECOMMENDATION_CONTROLLER = "ProductRecommendationServlet";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -42,18 +39,20 @@ public class ProductDetailServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String productID = request.getParameter("productID");
+        String productIDStr = request.getParameter("productID");
         String url = START_UP_CONTROLLER;
         try {
             /* TODO output your page here. You may use following sample code. */
-            if (productID!=null) {
+            if (productIDStr!=null) {
                 ProductDAO dao = new ProductDAO();
+                int productID = Integer.parseInt(productIDStr);
                 ProductDTO dto = dao.getProductDTO(productID);
                 if (dto.getQuantity() == 0) {
                     request.setAttribute("QUANTITY", 0);
                 }
                 request.setAttribute("PRODUCTDETAIL", dto);
-                url = PRODUCT_DETAIL_PAGE;
+                request.setAttribute("PRODUCTID", productID);
+                url = PRODUCT_RECOMMENDATION_CONTROLLER;
             }
         } catch (SQLException ex) {
             log("ProductDetail_SQL:"+ex.getMessage());

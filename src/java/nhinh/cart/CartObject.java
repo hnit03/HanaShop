@@ -56,6 +56,7 @@ public class CartObject {
             }
         }
     }
+
     public void minusProductFromCart(int productID) {
         if (this.products == null) {
             return;

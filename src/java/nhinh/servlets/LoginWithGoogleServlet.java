@@ -59,14 +59,14 @@ public class LoginWithGoogleServlet extends HttpServlet {
                 boolean isAdmin = false;
                 if (role != -1) {
                     if (role == 0) {
-                        url = "UserStartUpServlet";
+                        url = "StartUpServlet";
                         UserDetailsDAO udao = new UserDetailsDAO();
                         UserDetailsDTO udto = udao.getUserDetails(userID);
                         session.setAttribute("USER_DETAILS", udto);
                         session.setAttribute("USERID", userID);
                         isAdmin = false;
                     } else {
-                        url = "AdminStartUpServlet";
+                        url = "StartUpServlet";
                         isAdmin = true;
                     }
                     session.setAttribute("USERID", userID);

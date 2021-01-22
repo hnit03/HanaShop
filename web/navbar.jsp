@@ -28,16 +28,6 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="StartUpServlet">Home</a>
                     </li>
-                    <c:if test="${role != 'true'}">
-                        <li class="nav-item">
-                            <c:url var="viewCart" value="DispatchServlet">
-                                <c:param name="btnAction" value="View Cart"/>
-                            </c:url>
-                            <a class="nav-link" href="${viewCart}">
-                                <i class="fas fa-shopping-cart"></i>
-                            </a>
-                        </li>
-                    </c:if>
 
                     <c:if test="${empty sessionScope.FULLNAME}">
                         <li class="nav-item">
@@ -48,7 +38,36 @@
                         </li>
                     </c:if>
                     <c:if test="${not empty sessionScope.FULLNAME}">
-
+                        <c:if test="${role != 'true'}">
+                            <li class="nav-item">
+                                <c:url var="viewCart" value="DispatchServlet">
+                                    <c:param name="btnAction" value="View Cart"/>
+                                </c:url>
+                                <a class="nav-link" href="${viewCart}">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </a>
+                            </li>
+                        </c:if>
+                        <c:if test="${role != 'true'}">
+                            <li class="nav-item">
+                                <c:url var="history" value="DispatchServlet">
+                                    <c:param name="btnAction" value="Shopping History"/>
+                                </c:url>
+                                <a class="nav-link" href="${history}">
+                                    <i class="fas fa-history"></i>
+                                </a>
+                            </li>
+                        </c:if>
+                            <c:if test="${role == 'true'}">
+                            <li class="nav-item">
+                                <c:url var="adminHistory" value="DispatchServlet">
+                                    <c:param name="btnAction" value="Admin History"/>
+                                </c:url>
+                                <a class="nav-link" href="${adminHistory}">
+                                    <i class="fas fa-history"></i>
+                                </a>
+                            </li>
+                        </c:if>
                         <li class="nav-item">
                             <span class="nav-link">Welcome, ${sessionScope.FULLNAME}
                                 <c:if test="${role == 'true'}">

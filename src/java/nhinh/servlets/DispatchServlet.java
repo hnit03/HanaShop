@@ -34,11 +34,13 @@ public class DispatchServlet extends HttpServlet {
     private final String PRODUCT_DETAIL_CONTROLLER = "ProductDetailServlet";
     private final String VIEW_CART_PAGE = "viewCart.jsp";
     private final String REMOVE_PRODUCT_CONTROLLER = "RemoveProductFromCartServlet";
-    private final String CHECKOUT_CONTROLLER = "CheckoutServlet";
     private final String LOGOUT_CONTROLLER = "LogoutServlet";
     private final String PAYMENT_CONTROLLER = "PaymentServlet";
     private final String PAGINATION_CONTROLLER = "PaginationServlet";
-
+    private final String CHECKOUT_PAGE = "checkout.jsp";
+    private final String SHOPPING_HISTORY_CONTROLLER = "ShoppingHistoryServlet";
+    private final String SEARCH_SHOPPING_HISTORY_CONTROLLER = "SearchShoppingHistoryServlet";
+    private final String PRODUCT_HISTORY_CONTROLLER = "ProductHistoryServlet";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -76,7 +78,9 @@ public class DispatchServlet extends HttpServlet {
                             url = SEARCH_PRODUCT_PAGE;
                         } else if ("Search By Admin".equals(button)) {
                             url = SEARCH_PRODUCT_CONTROLLER;
-                        }
+                        } else if ("Admin History".equals(button)) {
+                            url = PRODUCT_HISTORY_CONTROLLER;
+                        } 
                     }
                     if (!role) {
                         if ("Search Button".equals(button)) {
@@ -91,12 +95,16 @@ public class DispatchServlet extends HttpServlet {
                             url = VIEW_CART_PAGE;
                         } else if ("Remove".equals(button) || "Minus".equals(button)) {
                             url = REMOVE_PRODUCT_CONTROLLER;
-                        } else if ("Checkout".equals(button)) {
-                            url = CHECKOUT_CONTROLLER;
                         } else if ("Pay".equals(button)) {
                             url = PAYMENT_CONTROLLER;
                         } else if ("Next".equals(button) || "Previous".equals(button)) {
                             url = PAGINATION_CONTROLLER;
+                        } else if ("Checkout".equals(button)) {
+                            url = CHECKOUT_PAGE;
+                        } else if("Shopping History".equals(button)){
+                            url = SHOPPING_HISTORY_CONTROLLER;
+                        } else if ("Search History".equals(button)) {
+                            url = SEARCH_SHOPPING_HISTORY_CONTROLLER;
                         }
                     }
                 }

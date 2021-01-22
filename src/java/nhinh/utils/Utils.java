@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.UUID;
 import javax.servlet.http.Part;
 
 /*
@@ -21,15 +23,27 @@ import javax.servlet.http.Part;
 public class Utils {
 
     public String formatDateToString(Date date) {
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/YYYY");
+        SimpleDateFormat df = new SimpleDateFormat("YYYY-MM-dd");
         String dateFormat = df.format(date);
         return dateFormat;
     }
 
     public String formatStringToDate(String strDate) {
         java.sql.Date date = java.sql.Date.valueOf(strDate);
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/YYYY");
+        SimpleDateFormat df = new SimpleDateFormat("YYYY-MM-dd");
         String dateFormat = df.format(date);
+        return dateFormat;
+    }
+
+    public String formatDateTimeToString(Date date) {
+        SimpleDateFormat df = new SimpleDateFormat("YYYY-MM-dd hh:mm:ss");
+        String dateFormat = df.format(date);
+        return dateFormat;
+    }
+
+    public String formatStringToDateTime(LocalDateTime strDate) {
+        SimpleDateFormat df = new SimpleDateFormat("YYYY-MM-dd hh:mm:ss");
+        String dateFormat = df.format(strDate);
         return dateFormat;
     }
 
@@ -38,9 +52,7 @@ public class Utils {
         OutputStream os = null;
         try {
             File outputFilePath = new File(path + fileName);
-            if (!outputFilePath.exists()) {
-                outputFilePath.createNewFile();
-            }
+            outputFilePath.createNewFile();
             is = part.getInputStream();
             os = new FileOutputStream(outputFilePath);
             int read = 0;
@@ -58,4 +70,8 @@ public class Utils {
         }
     }
 
+    public String getRandomID() {
+        UUID uuid = UUID.randomUUID();
+        return uuid.toString();
+    }
 }

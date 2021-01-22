@@ -45,11 +45,16 @@ public class RemoveProductFromCartServlet extends HttpServlet {
                 CartObject cart = (CartObject) session.getAttribute("CUSTCART");
                 if (cart != null) {
                     int productID = Integer.parseInt(productIDStr);
-                    if (minus!=null) {
+                    if (minus != null) {
                         cart.minusProductFromCart(productID);
-                    }else{
+                    } else {
                         cart.removeProductFromCart(productID);
                         request.setAttribute("REMOVE_SUCCESS", true);
+                        int numOfProduct = (int) session.getAttribute("NUM_OF_PRODUCT");
+                        if (numOfProduct > 0) {
+                            numOfProduct -= 1;
+                            session.setAttribute("NUM_OF_PRODUCT", numOfProduct);
+                        }
                     }
                 }
             }

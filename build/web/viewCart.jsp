@@ -47,6 +47,12 @@
                 alert("Remove Successfully!");
             </script>
         </c:if>
+        <c:set var="outOfStock" value="${requestScope.OUT_OF_STOCK}"/>
+        <c:if test="${outOfStock eq 'true'}">
+            <script>
+                alert("Out Of Stock!");
+            </script>
+        </c:if>
         <div class="container" style="background-color: white;padding: 20px;min-height: 400px;">
             <h1>Cart</h1>
             <c:if test="${not empty sessionScope}">
@@ -103,7 +109,13 @@
 
                                                     <input type="text" 
                                                            name="txtAmount" 
-                                                           value="${product.value}" 
+                                                           <c:if test="${outOfStock eq 'true'}">
+                                                               value="${requestScope.QUANTITY_IN_STOCK}"
+                                                           </c:if>
+                                                           <c:if test="${outOfStock != 'true'}">
+                                                               value="${product.value}" 
+                                                           </c:if>
+                                                           
                                                            id="number${product.key.productID}" 
                                                            class="btn btn-number" 
                                                            style="width: 50px;border: 1px solid #bdc3c7"
@@ -111,7 +123,6 @@
                                                     <c:url var="plus" value="DispatchServlet">
                                                         <c:param name="btnAction" value="Plus"/>
                                                         <c:param name="productID" value="${product.key.productID}"/>
-                                                        <c:param name="txtAmount" value="1"/>
                                                         <c:param name="plus" value="true"/>
                                                     </c:url>
                                                     <a class="btn btn-number" href="${plus}">
@@ -131,8 +142,8 @@
 
                                                 <div id="modal${product.key.productID}" class="modal">
                                                     <div class="modal-content">
-                                                        <h5 class="modal-title">Modal title${product.key.productID}</h5>
-                                                        <p>Do you want delete this product </p><br/>
+                                                        <h5 class="modal-title">Do you want to remove this product from cart?</h5>
+                                                        <br/>
                                                         <div class="modal-footer">
                                                             <c:url var="remove" value="DispatchServlet">
                                                                 <c:param name="btnAction" value="Remove"/>
@@ -181,35 +192,5 @@
                 </c:if>
             </c:if>
         </div>
-        <script>
-            function up(max, id, price) {
-                var number = document.getElementById("number" + id).value;
-                if (number < max) {
-                    number++;
-                }
-                var total = number * price;
-                document.getElementById("number" + id).value = number;
-                document.getElementById("total" + id).innerHTML = total;
-                var totalPrice = document.getElementById("totalPrice").value;
-                totalPrice = parseFloat(totalPrice);
-                totalPrice = totalPrice + price;
-                document.getElementById("totalPrice").value = totalPrice;
-
-            }
-
-            function down(id, price) {
-                var number = document.getElementById("number" + id).value;
-                if (number > 1) {
-                    number--;
-                }
-                var total = number * price;
-                document.getElementById("number" + id).value = number;
-                document.getElementById("total" + id).innerHTML = total;
-                var totalPrice = document.getElementById("totalPrice").value;
-                totalPrice = parseFloat(totalPrice);
-                totalPrice = totalPrice - price;
-                document.getElementById("totalPrice").value = totalPrice;
-            }
-        </script>
     </body>
 </html>

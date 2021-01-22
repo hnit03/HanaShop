@@ -8,6 +8,7 @@ package nhinh.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
@@ -17,11 +18,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import nhinh.daos.CategoryDAO;
 import nhinh.daos.ProductDAO;
+import nhinh.daos.ProductHistoryDAO;
 import nhinh.dtos.CategoryDTO;
 import nhinh.dtos.ProductDTO;
+import nhinh.dtos.ProductHistoryDTO;
 import nhinh.utils.Utils;
 
 /**
@@ -46,14 +50,14 @@ public class UpdateProductServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         String productIDStr = request.getParameter("productID");
         String categoryName = request.getParameter("cboCategory");
-        String statusStr = request.getParameter("cboStatus");
         String updateDetail = request.getParameter("updateDetail");
+        String statusStr = request.getParameter("cboStatus");
         boolean status = false;
         try {
-            /* TODO output your page here. You may use following sample code. */
             if (statusStr.equals("Active")) {
                 status = true;
             }
+            /* TODO output your page here. You may use following sample code. */
             int productID = 0;
             if (productIDStr != null) {
                 productID = Integer.parseInt(productIDStr);
@@ -62,11 +66,37 @@ public class UpdateProductServlet extends HttpServlet {
             CategoryDTO cdto = cdao.getCategoryDTO(categoryName);
             ProductDAO pdao = new ProductDAO();
             Utils utils = new Utils();
+            HttpSession session = request.getSession(false);
+            String userID = "";
+            Object userIDObj = session.getAttribute("USERID");
+            if (userIDObj != null) {
+                userID = (String) userIDObj;
+            }
+            ProductHistoryDAO phdao = new ProductHistoryDAO();
+            Date date = new Date();
+            String dateAction = utils.formatDateToString(date);
+            ProductDTO dtoUpdate = pdao.getProductDTO(productID);
             if (updateDetail.equals("false")) {
-                boolean updateSuccess = pdao.updateQuickly(productID, cdto.getCategoryID(), status);
-                if (updateSuccess) {
-                    request.setAttribute("UPDATE_SUCCESS", true);
+                if (categoryName != null) {
+                    boolean updateSuccess = pdao.updateCategory(productID, cdto.getCategoryID());
+                    if (updateSuccess) {
+                        request.setAttribute("UPDATE_SUCCESS", true);
+                        if (dtoUpdate != null) {
+                            phdao.insertAction(dtoUpdate, userID, "Update category of product", dateAction);
+                        }
+
+                    }
                 }
+                if (statusStr != null) {
+                    boolean updateSuccess = pdao.updateStatus(productID, status);
+                    if (updateSuccess) {
+                        request.setAttribute("UPDATE_SUCCESS", true);
+                        if (dtoUpdate != null) {
+                            phdao.insertAction(dtoUpdate, userID, "Update status", dateAction);
+                        }
+                    }
+                }
+
             } else if (updateDetail.equals("true")) {
                 ProductDTO oldDTO = pdao.getProductDTOByAdmin(productID);
                 String productName = request.getParameter("txtProductName");
@@ -77,7 +107,7 @@ public class UpdateProductServlet extends HttpServlet {
                 }
                 int lastIndex = img.lastIndexOf(".");
                 String ext = "." + img.substring(lastIndex + 1);
-                img = productName + ext;
+                img = productName.trim() + ext;
                 String description = request.getParameter("txtDescription");
                 String priceStr = request.getParameter("txtPrice");
                 String quantityStr = request.getParameter("txtQuantity");
@@ -97,6 +127,9 @@ public class UpdateProductServlet extends HttpServlet {
                     realPath = realPath + "images/";
                     utils.storeFile(realPath, img, filePart);
                     request.setAttribute("UPDATE_SUCCESS", true);
+                    if (dtoUpdate != null) {
+                        phdao.insertAction(dtoUpdate, userID, "Update Details", dateAction);
+                    }
                 }
             }
         } catch (SQLException ex) {

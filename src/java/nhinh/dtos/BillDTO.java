@@ -6,6 +6,7 @@
 package nhinh.dtos;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -16,14 +17,18 @@ public class BillDTO implements Serializable{
     private int billID;
     private String userID;
     private float totalPrice;
-
+    private int numOfProduct;
+    private String orderTime;
+    
     public BillDTO() {
     }
 
-    public BillDTO(int billID, String userID, float totalPrice) {
+    public BillDTO(int billID, String userID, float totalPrice, int numOfProduct, String orderTime) {
         this.billID = billID;
         this.userID = userID;
         this.totalPrice = totalPrice;
+        this.numOfProduct = numOfProduct;
+        this.orderTime = orderTime;
     }
 
     /**
@@ -67,6 +72,35 @@ public class BillDTO implements Serializable{
     public void setTotalPrice(float totalPrice) {
         this.totalPrice = totalPrice;
     }
+
+    /**
+     * @return the numOfProduct
+     */
+    public int getNumOfProduct() {
+        return numOfProduct;
+    }
+
+    /**
+     * @param numOfProduct the numOfProduct to set
+     */
+    public void setNumOfProduct(int numOfProduct) {
+        this.numOfProduct = numOfProduct;
+    }
+
+    /**
+     * @return the orderTime
+     */
+    public String getOrderTime() {
+        return orderTime;
+    }
+
+    /**
+     * @param orderTime the orderTime to set
+     */
+    public void setOrderTime(String orderTime) {
+        this.orderTime = orderTime;
+    }
+
     
     
 }

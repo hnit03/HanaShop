@@ -18,24 +18,21 @@ import nhinh.utils.DBHelper;
  * @author PC
  */
 public class BillDAO implements Serializable{
-   public int insertBill(int billID, String userID, float totalPrice) throws SQLException, NamingException {
-        //1.connect DB
+   public int insertBill(int billID, String userID, float totalPrice, int numOfProduct, String dateTime) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         int result = 0;
         try {
             con = DBHelper.makeConnection();
-            //2.tao lenh truy vna61
             if (con != null) {
-                String sql = "INSERT INTO Bill(BillID,userID,TotalPrice) "
-                        + "VALUES(?,?,?);";
-                //3.tao doi tuong thuc hien truy van (PrepareST)
+                String sql = "INSERT INTO Bill(BillID,userID,TotalPrice,numOfProduct,orderTime) "
+                        + "VALUES(?,?,?,?,?);";
                 ps = con.prepareStatement(sql);
                 ps.setInt(1, billID);
                 ps.setString(2, userID);
-                ps.setFloat(3, totalPrice);
-                //4.execute
-                
+                ps.setFloat(3, totalPrice);   
+                ps.setInt(4, numOfProduct); 
+                ps.setString(5, dateTime); 
                 result = ps.executeUpdate();
             }
             
