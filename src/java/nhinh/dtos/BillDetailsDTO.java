@@ -13,44 +13,60 @@ import java.io.Serializable;
  */
 public class BillDetailsDTO implements Serializable{
     
-    private int billID;
-    private int productID;
+    private String bdID;
+    private String billID;
+    private String productID;
     private int quantity;
 
     public BillDetailsDTO() {
     }
 
-    public BillDetailsDTO(int billID, int productID, int quantity) {
+    public BillDetailsDTO(String bdID, String billID, String productID, int quantity) {
+        this.bdID = bdID;
         this.billID = billID;
         this.productID = productID;
         this.quantity = quantity;
     }
 
     /**
+     * @return the bdID
+     */
+    public String getBdID() {
+        return bdID;
+    }
+
+    /**
+     * @param bdID the bdID to set
+     */
+    public void setBdID(String bdID) {
+        this.bdID = bdID;
+    }
+
+    /**
      * @return the billID
      */
-    public int getBillID() {
+    public String getBillID() {
         return billID;
     }
 
     /**
      * @param billID the billID to set
      */
-    public void setBillID(int billID) {
+    public void setBillID(String billID) {
         this.billID = billID;
     }
 
     /**
      * @return the productID
      */
-    public int getProductID() {
+    public String getProductID() {
         return productID;
     }
 
     /**
      * @param productID the productID to set
      */
-    public void setProductID(int productID) {
+    public void setProductID(String productID) {
         this.productID = productID;
     }
 
@@ -67,6 +83,7 @@ public class BillDetailsDTO implements Serializable{
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
     
     
 }

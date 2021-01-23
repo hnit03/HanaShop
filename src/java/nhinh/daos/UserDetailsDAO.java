@@ -30,12 +30,12 @@ public class UserDetailsDAO implements Serializable{
             if (con != null) {
                 String sql = "select id,userID,fullname,phone,address "
                         + "from UserDetails "
-                        + "where userID = (select userID from Registration where userID = ?)";
+                        + "where userID = (select userID from Registration where userID = ?) ";
                 ps = con.prepareStatement(sql);
                 ps.setString(1, userID);
                 rs = ps.executeQuery();
                 if (rs.next()) {
-                    int id = rs.getInt("id");
+                    String id = rs.getString("id");
                     String uID = rs.getString("userID");
                     String fullname = rs.getString("fullname");
                     int phone = rs.getInt("phone");
@@ -58,23 +58,22 @@ public class UserDetailsDAO implements Serializable{
         return dto;
     }
     
-    public boolean insertUserDetails(UserDetailsDTO dto)
+    public boolean insertUserDetails(String userID, String fullname, int phone, String address)
             throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps= null;
 
         String url = "insert into UserDetails(id,userID,fullname,phone,address) "
-                + "values(?,?,?,?,?)";
+                + "values(NEWID(),?,?,?,?)";
         try {
             con = DBHelper.makeConnection();
 
             if (con != null) {
                 ps = con.prepareStatement(url);
-                ps.setInt(1, dto.getId());
-                ps.setString(2, dto.getUserID());
-                ps.setString(3, dto.getFullname());
-                ps.setInt(4, dto.getPhone());
-                ps.setString(5, dto.getAddress());
+                ps.setString(1, userID);
+                ps.setString(2, fullname);
+                ps.setInt(3, phone);
+                ps.setString(4, address);
                 int count = ps.executeUpdate();
                 if (count > 0) {
                     return true;
@@ -90,34 +89,4 @@ public class UserDetailsDAO implements Serializable{
         }
         return false;
     }
-    public int getLastIDFromUD() throws SQLException, NamingException {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            con = DBHelper.makeConnection();
-            if (con != null) {
-                String sql = "Select top 1 id "
-                        + "from UserDetails "
-                        + "order by id desc";
-                ps = con.prepareStatement(sql);
-                rs = ps.executeQuery();
-                if (rs.next()) {
-                    return rs.getInt("id");
-                }
-
-            }
-        } finally{
-            if(rs!=null){
-                rs.close();
-            }
-            if(ps!=null){
-                ps.close();
-            }
-            if (con!=null) {
-                con.close();
-            }
-        }
-        return -1;
-    } 
 }

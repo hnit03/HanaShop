@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @author PC
  */
 public class UserDetailsDTO implements Serializable{
-    private int id;
+    private String id;
     private String userID;
     private String fullname;
     private int phone;
@@ -21,7 +21,7 @@ public class UserDetailsDTO implements Serializable{
     public UserDetailsDTO() {
     }
 
-    public UserDetailsDTO(int id, String userID, String fullname, int phone, String address) {
+    public UserDetailsDTO(String id, String userID, String fullname, int phone, String address) {
         this.id = id;
         this.userID = userID;
         this.fullname = fullname;
@@ -32,14 +32,14 @@ public class UserDetailsDTO implements Serializable{
     /**
      * @return the id
      */
-    public int getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * @param id the id to set
      */
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

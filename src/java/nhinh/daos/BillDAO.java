@@ -18,7 +18,7 @@ import nhinh.utils.DBHelper;
  * @author PC
  */
 public class BillDAO implements Serializable{
-   public int insertBill(int billID, String userID, float totalPrice, int numOfProduct, String dateTime) throws SQLException, NamingException {
+   public int insertBill( String userID, float totalPrice, int numOfProduct, String dateTime) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         int result = 0;
@@ -26,13 +26,12 @@ public class BillDAO implements Serializable{
             con = DBHelper.makeConnection();
             if (con != null) {
                 String sql = "INSERT INTO Bill(BillID,userID,TotalPrice,numOfProduct,orderTime) "
-                        + "VALUES(?,?,?,?,?);";
+                        + "VALUES(NEWID(),?,?,?,?);";
                 ps = con.prepareStatement(sql);
-                ps.setInt(1, billID);
-                ps.setString(2, userID);
-                ps.setFloat(3, totalPrice);   
-                ps.setInt(4, numOfProduct); 
-                ps.setString(5, dateTime); 
+                ps.setString(1, userID);
+                ps.setFloat(2, totalPrice);   
+                ps.setInt(3, numOfProduct); 
+                ps.setString(4, dateTime); 
                 result = ps.executeUpdate();
             }
             
@@ -46,7 +45,7 @@ public class BillDAO implements Serializable{
         }
         return result;
     }
-    public int getLastBillIDFromBill() throws SQLException, NamingException {
+    public String getLastBillIDFromBill() throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -59,7 +58,7 @@ public class BillDAO implements Serializable{
                 ps = con.prepareStatement(sql);
                 rs = ps.executeQuery();
                 if (rs.next()) {
-                    return rs.getInt("BillID");
+                    return rs.getString("BillID");
                 }
 
             }
@@ -74,6 +73,6 @@ public class BillDAO implements Serializable{
                 con.close();
             }
         }
-        return -1;
+        return "";
     } 
 }

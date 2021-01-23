@@ -16,7 +16,6 @@
         <link rel="stylesheet" href="css/styles.css">
     </head>
     <body>
-        <jsp:include page="navbar.jsp"/>
         <div style="background-color: white;
              padding: 20px 100px 20px 100px; margin-bottom: 20px;margin-top: -20px;">
             <form action="DispatchServlet" method="GET" class="d-flex">

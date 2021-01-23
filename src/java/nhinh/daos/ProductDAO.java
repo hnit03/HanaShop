@@ -32,39 +32,7 @@ public class ProductDAO implements Serializable {
         return productList;
     }
 
-    public int getLastProduct() throws SQLException, NamingException {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        int productID = 0;
-        try {
-            con = DBHelper.makeConnection();
-            if (con != null) {
-                String sql = "select top 1 productID "
-                        + "from Product "
-                        + "order by productID desc";
-                ps = con.prepareStatement(sql);
-                rs = ps.executeQuery();
-                if (rs.next()) {
-                    productID = rs.getInt("productID");
-
-                }
-            }
-        } finally {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-            if (con != null) {
-                con.close();
-            }
-        }
-        return productID;
-    }
-
-    public ProductDTO getProductDTO(int pID) throws SQLException, NamingException {
+    public ProductDTO getProductDTO(String pID) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -76,14 +44,15 @@ public class ProductDAO implements Serializable {
                         + "from Product "
                         + "where productID = ? and status = 1 ";
                 ps = con.prepareStatement(sql);
-                ps.setInt(1, pID);
+                ps.setString(1, pID);
                 rs = ps.executeQuery();
                 while (rs.next()) {
-                    int productID = rs.getInt("productID");
+                    String productID = rs.getString("productID");
                     String productName = rs.getString("productName");
                     String image = rs.getString("image");
                     String description = rs.getString("description");
                     float price = rs.getFloat("price");
+                    price = (float) Math.round((price * 100) / 100);
                     String createDate = rs.getString("createDate");
                     String categoryID = rs.getString("categoryID");
                     CategoryDAO dao = new CategoryDAO();
@@ -108,7 +77,7 @@ public class ProductDAO implements Serializable {
         return dto;
     }
 
-    public ProductDTO getProductDTOByAdmin(int pID) throws SQLException, NamingException {
+    public ProductDTO getProductDTOByAdmin(String pID) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -120,14 +89,15 @@ public class ProductDAO implements Serializable {
                         + "from Product "
                         + "where productID = ? ";
                 ps = con.prepareStatement(sql);
-                ps.setInt(1, pID);
+                ps.setString(1, pID);
                 rs = ps.executeQuery();
                 while (rs.next()) {
-                    int productID = rs.getInt("productID");
+                    String productID = rs.getString("productID");
                     String productName = rs.getString("productName");
                     String image = rs.getString("image");
                     String description = rs.getString("description");
                     float price = rs.getFloat("price");
+                    price = (float) Math.round((price * 100) / 100);
                     String createDate = rs.getString("createDate");
                     String categoryID = rs.getString("categoryID");
                     CategoryDAO dao = new CategoryDAO();
@@ -150,6 +120,53 @@ public class ProductDAO implements Serializable {
             }
         }
         return dto;
+    }
+
+    public void getAllActiveProductsForCheckout() throws SQLException, NamingException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = DBHelper.makeConnection();
+            if (con != null) {
+                String sql = "SELECT productID,productName,image,description,price,createDate,categoryID,status,quantity "
+                        + "FROM Product "
+                        + "WHERE status = 1 "
+                        + "ORDER BY createDate ASC ";
+                ps = con.prepareStatement(sql);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    String productID = rs.getString("productID");
+                    String productName = rs.getString("productName");
+                    String image = rs.getString("image");
+                    String description = rs.getString("description");
+                    float price = rs.getFloat("price");
+                    price = (float) Math.round((price * 100) / 100);
+                    String createDate = rs.getString("createDate");
+                    String categoryID = rs.getString("categoryID");
+                    CategoryDAO dao = new CategoryDAO();
+                    dao.getAllCategory();
+                    CategoryDTO cdto = dao.findCategoryDTO(categoryID);
+                    boolean status = rs.getBoolean("status");
+                    int quantity = rs.getInt("quantity");
+                    ProductDTO dto = new ProductDTO(productID, productName, image, description, price, createDate, cdto, status, quantity);
+                    if (this.productList == null) {
+                        this.productList = new ArrayList<>();
+                    }
+                    this.productList.add(dto);
+                }
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        }
     }
 
     public void getAllActiveProducts(int pageNo) throws SQLException, NamingException {
@@ -171,7 +188,7 @@ public class ProductDAO implements Serializable {
                 ps.setInt(2, RECORDS_IN_PAGE);
                 rs = ps.executeQuery();
                 while (rs.next()) {
-                    int productID = rs.getInt("productID");
+                    String productID = rs.getString("productID");
                     String productName = rs.getString("productName");
                     String image = rs.getString("image");
                     String description = rs.getString("description");
@@ -224,7 +241,7 @@ public class ProductDAO implements Serializable {
                     this.productList = new ArrayList<>();
                 }
                 while (rs.next()) {
-                    int productID = rs.getInt("productID");
+                    String productID = rs.getString("productID");
                     String productName = rs.getString("productName");
                     String image = rs.getString("image");
                     String description = rs.getString("description");
@@ -279,11 +296,12 @@ public class ProductDAO implements Serializable {
                 ps.setInt(6, RECORDS_IN_PAGE);
                 rs = ps.executeQuery();
                 while (rs.next()) {
-                    int productID = rs.getInt("productID");
+                    String productID = rs.getString("productID");
                     String productName = rs.getString("productName");
                     String image = rs.getString("image");
                     String description = rs.getString("description");
                     float price = rs.getFloat("price");
+                    price = (float) Math.round((price * 100) / 100);
                     String createDate = rs.getString("createDate");
                     String categoryID = rs.getString("categoryID");
                     CategoryDAO dao = new CategoryDAO();
@@ -338,11 +356,12 @@ public class ProductDAO implements Serializable {
                 ps.setInt(6, RECORDS_IN_PAGE);
                 rs = ps.executeQuery();
                 while (rs.next()) {
-                    int productID = rs.getInt("productID");
+                    String productID = rs.getString("productID");
                     String productName = rs.getString("productName");
                     String image = rs.getString("image");
                     String description = rs.getString("description");
                     float price = rs.getFloat("price");
+                    price = (float) Math.round((price * 100) / 100);
                     String createDate = rs.getString("createDate");
                     String categoryID = rs.getString("categoryID");
                     CategoryDAO dao = new CategoryDAO();
@@ -370,24 +389,24 @@ public class ProductDAO implements Serializable {
         }
     }
 
-    public boolean createNewProduct(ProductDTO dto) throws SQLException, NamingException {
+    public boolean createNewProduct(String productName, String image, String description, float price,
+            String createDate, CategoryDTO cdto, boolean status, int quantity) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         try {
             con = DBHelper.makeConnection();
             if (con != null) {
                 String sql = "insert into Product(productID,productName,image,description,price,createDate,categoryID,status,quantity) "
-                        + "values(?,?,?,?,?,?,?,?,?)";
+                        + "values(newid(),?,?,?,?,?,?,?,?)";
                 ps = con.prepareStatement(sql);
-                ps.setInt(1, dto.getProductID());
-                ps.setString(2, dto.getProductName());
-                ps.setString(3, dto.getImage());
-                ps.setString(4, dto.getDescription());
-                ps.setFloat(5, dto.getPrice());
-                ps.setString(6, dto.getCreateDate());
-                ps.setString(7, dto.getCdto().getCategoryID());
-                ps.setBoolean(8, dto.isStatus());
-                ps.setInt(9, dto.getQuantity());
+                ps.setString(1, productName);
+                ps.setString(2, image);
+                ps.setString(3, description);
+                ps.setFloat(4, price);
+                ps.setString(5, createDate);
+                ps.setString(6, cdto.getCategoryID());
+                ps.setBoolean(7, status);
+                ps.setInt(8, quantity);
                 int row = ps.executeUpdate();
                 if (row > 0) {
                     return true;
@@ -423,7 +442,7 @@ public class ProductDAO implements Serializable {
                 ps.setString(6, dto.getCdto().getCategoryID());
                 ps.setBoolean(7, dto.isStatus());
                 ps.setInt(8, dto.getQuantity());
-                ps.setInt(9, dto.getProductID());
+                ps.setString(9, dto.getProductID());
                 int row = ps.executeUpdate();
                 if (row > 0) {
                     return true;
@@ -440,7 +459,7 @@ public class ProductDAO implements Serializable {
         return false;
     }
 
-    public int getQuantityProduct(int productID)
+    public int getQuantityProduct(String productID)
             throws NamingException, SQLException {
         Connection con = null;
         PreparedStatement ps = null;
@@ -453,7 +472,7 @@ public class ProductDAO implements Serializable {
 
             if (con != null) {
                 ps = con.prepareStatement(sql);
-                ps.setInt(1, productID);
+                ps.setString(1, productID);
                 rs = ps.executeQuery();
                 if (rs.next()) {
                     return rs.getInt("Quantity");
@@ -473,7 +492,7 @@ public class ProductDAO implements Serializable {
         return -1;
     }
 
-    public boolean updateQuantity(int productID, int decrease) throws SQLException, NamingException {
+    public boolean updateQuantity(String productID, int decrease) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         try {
@@ -485,7 +504,7 @@ public class ProductDAO implements Serializable {
                 ps = con.prepareStatement(sql);
                 int totalQuantity = getQuantityProduct(productID);
                 ps.setInt(1, (totalQuantity - decrease));
-                ps.setInt(2, productID);
+                ps.setString(2, productID);
                 int row = ps.executeUpdate();
                 if (row > 0) {
                     return true;
@@ -502,7 +521,7 @@ public class ProductDAO implements Serializable {
         return false;
     }
 
-    public boolean updateCategory(int productID, String categoryID) throws SQLException, NamingException {
+    public boolean updateCategory(String productID, String categoryID) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         try {
@@ -513,7 +532,7 @@ public class ProductDAO implements Serializable {
                         + "where productID = ?";
                 ps = con.prepareStatement(sql);
                 ps.setString(1, categoryID);
-                ps.setInt(2, productID);
+                ps.setString(2, productID);
                 int row = ps.executeUpdate();
                 if (row > 0) {
                     return true;
@@ -529,7 +548,8 @@ public class ProductDAO implements Serializable {
         }
         return false;
     }
-    public boolean updateStatus(int productID, boolean status) throws SQLException, NamingException {
+
+    public boolean updateStatus(String productID, boolean status) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         try {
@@ -540,7 +560,7 @@ public class ProductDAO implements Serializable {
                         + "where productID = ?";
                 ps = con.prepareStatement(sql);
                 ps.setBoolean(1, status);
-                ps.setInt(2, productID);
+                ps.setString(2, productID);
                 int row = ps.executeUpdate();
                 if (row > 0) {
                     return true;
@@ -560,6 +580,7 @@ public class ProductDAO implements Serializable {
     public boolean checkDupName(String productName) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
             con = DBHelper.makeConnection();
             if (con != null) {
@@ -568,12 +589,15 @@ public class ProductDAO implements Serializable {
                         + "where productName = ?";
                 ps = con.prepareStatement(sql);
                 ps.setString(1, productName);
-                int row = ps.executeUpdate();
-                if (row > 0) {
+                rs = ps.executeQuery();
+                if (rs.next()) {
                     return true;
                 }
             }
         } finally {
+            if (rs!=null) {
+                rs.close();
+            }
             if (ps != null) {
                 ps.close();
             }
@@ -730,7 +754,7 @@ public class ProductDAO implements Serializable {
         return numofpages;
     }
 
-    public ProductDTO getProductRecommendation(int productID) throws SQLException, NamingException {
+    public ProductDTO getProductRecommendation(String productID) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -751,11 +775,11 @@ public class ProductDAO implements Serializable {
                     + "	)";
             if (con != null) {
                 ps = con.prepareStatement(sql);
-                ps.setInt(1, productID);
-                ps.setInt(2, productID);
+                ps.setString(1, productID);
+                ps.setString(2, productID);
                 rs = ps.executeQuery();
                 if (rs.next()) {
-                    int pID = rs.getInt("productID");
+                    String pID = rs.getString("productID");
                     dto = getProductDTO(pID);
                 }
 
@@ -794,10 +818,11 @@ public class ProductDAO implements Serializable {
                 ps.setString(1, userID);
                 rs = ps.executeQuery();
                 while (rs.next()) {
-                    int pID = rs.getInt("productID");
+                    String pID = rs.getString("productID");
                     String productName = rs.getString("productName");
                     String image = rs.getString("image");
                     float price = rs.getFloat("price");
+                    price = (float) Math.round((price * 100) / 100);
                     String categoryID = rs.getString("categoryID");
                     CategoryDAO cdao = new CategoryDAO();
                     cdao.getAllCategory();
@@ -824,6 +849,7 @@ public class ProductDAO implements Serializable {
         }
         return list;
     }
+
     public Map<ProductDTO, String> searchShoppingHistory(String userID, String name, String date) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement ps = null;
@@ -842,14 +868,15 @@ public class ProductDAO implements Serializable {
             if (con != null) {
                 ps = con.prepareStatement(sql);
                 ps.setString(1, userID);
-                ps.setString(2, "%"+ date+"%");
-                ps.setString(3, "%"+name+"%");
+                ps.setString(2, date);
+                ps.setString(3, "%" + name + "%");
                 rs = ps.executeQuery();
                 while (rs.next()) {
-                    int pID = rs.getInt("productID");
+                    String pID = rs.getString("productID");
                     String productName = rs.getString("productName");
                     String image = rs.getString("image");
                     float price = rs.getFloat("price");
+                    price = (float) Math.round((price * 100) / 100);
                     String categoryID = rs.getString("categoryID");
                     CategoryDAO cdao = new CategoryDAO();
                     cdao.getAllCategory();

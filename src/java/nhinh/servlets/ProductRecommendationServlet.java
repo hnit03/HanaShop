@@ -8,8 +8,6 @@ package nhinh.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -17,8 +15,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.ProductDTO;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -26,7 +26,11 @@ import nhinh.dtos.ProductDTO;
  */
 @WebServlet(name = "ProductRecommendationServlet", urlPatterns = {"/ProductRecommendationServlet"})
 public class ProductRecommendationServlet extends HttpServlet {
+
     private final String PRODUCT_DETAIL_PAGE = "productDetail.jsp";
+    private final String START_UP_CONTROLLER = "StartUpServlet";
+    private Logger log = Logger.getLogger(ProductRecommendationServlet.class.getName());
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -40,25 +44,38 @@ public class ProductRecommendationServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String url = PRODUCT_DETAIL_PAGE;
+        String url = START_UP_CONTROLLER;
         try {
             /* TODO output your page here. You may use following sample code. */
-            Object productIDObj = request.getAttribute("PRODUCTID");
-            if (productIDObj != null) {
-                ProductDAO dao = new ProductDAO();
-                int productID = (int) productIDObj;
-                ProductDTO dto = dao.getProductRecommendation(productID);
-                if (dto!=null) {
-                    request.setAttribute("PRODUCT_RECOMMENDATION", dto);
+            String productID = (String) request.getAttribute("PRODUCTID");
+            if (productID != null) {
+                HttpSession session = request.getSession(false);
+                Object roleObj = session.getAttribute("ISADMIN");
+                if (roleObj != null) {
+                    boolean role = (boolean) roleObj;
+                    if (!role) {
+                        ProductDAO dao = new ProductDAO();
+                        ProductDTO dto = dao.getProductRecommendation(productID);
+                        if (dto != null) {
+                            request.setAttribute("PRODUCT_RECOMMENDATION", dto);
+                        }
+                    }
+                } else {
+                    ProductDAO dao = new ProductDAO();
+                    ProductDTO dto = dao.getProductRecommendation(productID);
+                    if (dto != null) {
+                        request.setAttribute("PRODUCT_RECOMMENDATION", dto);
+                    }
                 }
-            }
 
+            }
+            url = PRODUCT_DETAIL_PAGE;
         } catch (SQLException ex) {
-            Logger.getLogger(ProductRecommendationServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("ProductRecommendation_SQL:" + ex.getMessage());
         } catch (NamingException ex) {
-            Logger.getLogger(ProductRecommendationServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("ProductRecommendation_Naming:" + ex.getMessage());
         } finally {
-            RequestDispatcher rd =request.getRequestDispatcher(url);
+            RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);
             out.close();
         }

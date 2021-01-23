@@ -32,6 +32,8 @@
     <body>
         <jsp:include page="navbar.jsp"/>
         <div class="container" style="background-color: white;padding: 20px; width: 1280px;">
+            <c:set var="role" value="${sessionScope.ISADMIN}"/>
+            <c:if test="${role == 'true'}"> 
             <h1 class="text-center">Update Product</h1>
             <c:set var="product" value="${requestScope.PRODUCT}"/>
             <c:if test="${not empty product}">
@@ -54,7 +56,7 @@
                         </div>
                         <label class="form-label fontWeight">Choose image:</label>
                         <input type="file" class="form-control-file border"  id="upload" onchange="getImage()"
-                               name="file" value="${product.image}"
+                               name="file" value="${product.image}" accept="image/*"
                                />
                         <label class="form-label fontWeight">Description:</label>
                         <input class="form-control" type="text" name="txtDescription" 
@@ -64,7 +66,7 @@
                         <label class="form-label fontWeight">Price:</label>
                         <input class="form-control" type="number" name="txtPrice" 
                                value="${product.price}"
-                               placeholder="Price" 
+                               placeholder="Price"  min="0" max="1000"
                                maxlength="50" />
                         <label class="form-label fontWeight">Category:</label>
                         <select class="form-control" name="cboCategory">
@@ -81,7 +83,6 @@
                         </select>
                         <label class="form-label fontWeight">Status:</label>
                         <c:set var="listStatus" value="${applicationScope.STATUS_LIST}"/>
-                        <form action="DispatchServlet">
                             <c:if test="${not empty listStatus}">
                                 <select name="cboStatus" class="form-control">
                                     <c:if test="${not empty listStatus}">
@@ -106,7 +107,7 @@
                             <input class="form-control" type="number" name="txtQuantity" 
                                    value="${product.quantity}"
                                    placeholder="Quantity"
-                                   maxlength="50" />
+                                   maxlength="50" min="0" max="100"/>
                             <div class="text-center" style="margin-top: 20px;">
                                 <input type="submit" value="Save" name="btnAction" class="btn btn-primary" style="width: 200px"/>
                                 <input type="hidden" name="productID" value="${product.productID}" />
@@ -119,6 +120,17 @@
                             </div>
 
                         </form>
+                </div>
+            </c:if>
+            </c:if>
+            <c:if test="${role == 'false' or empty role}">
+                <h1 class="text-center">OPPS, ACCESS DENIED</h1>
+                <p class="text-center">You don’t have permission to access on this page</p>
+                <c:url var="home" value="DispatchServlet">
+                    <c:param name="btnAction" value=""/>
+                </c:url>
+                <div class="text-center">
+                    <a href="${home}" class="btn btn-danger">Back To Home Page</a>
                 </div>
             </c:if>
         </div>

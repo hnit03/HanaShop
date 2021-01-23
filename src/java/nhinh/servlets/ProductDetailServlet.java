@@ -15,8 +15,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.ProductDTO;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -24,8 +26,11 @@ import nhinh.dtos.ProductDTO;
  */
 @WebServlet(name = "ProductDetailServlet", urlPatterns = {"/ProductDetailServlet"})
 public class ProductDetailServlet extends HttpServlet {
+
     private final String START_UP_CONTROLLER = "StartUpServlet";
     private final String PRODUCT_RECOMMENDATION_CONTROLLER = "ProductRecommendationServlet";
+    private Logger log = Logger.getLogger(ProductDetailServlet.class.getName());
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -39,26 +44,42 @@ public class ProductDetailServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String productIDStr = request.getParameter("productID");
+        String productID = request.getParameter("productID");
         String url = START_UP_CONTROLLER;
         try {
             /* TODO output your page here. You may use following sample code. */
-            if (productIDStr!=null) {
-                ProductDAO dao = new ProductDAO();
-                int productID = Integer.parseInt(productIDStr);
-                ProductDTO dto = dao.getProductDTO(productID);
-                if (dto.getQuantity() == 0) {
-                    request.setAttribute("QUANTITY", 0);
+            if (productID != null) {
+                HttpSession session = request.getSession(false);
+                Object roleObj = session.getAttribute("ISADMIN");
+                if (roleObj != null) {
+                    boolean role = (boolean) roleObj;
+                    if (!role) {
+                        ProductDAO dao = new ProductDAO();
+                        ProductDTO dto = dao.getProductDTO(productID);
+                        if (dto.getQuantity() == 0) {
+                            request.setAttribute("QUANTITY", 0);
+                        }
+                        request.setAttribute("PRODUCTDETAIL", dto);
+                        request.setAttribute("PRODUCTID", productID);
+                        url = PRODUCT_RECOMMENDATION_CONTROLLER;
+                    }
+                } else {
+                    ProductDAO dao = new ProductDAO();
+                    ProductDTO dto = dao.getProductDTO(productID);
+                    if (dto.getQuantity() == 0) {
+                        request.setAttribute("QUANTITY", 0);
+                    }
+                    request.setAttribute("PRODUCTDETAIL", dto);
+                    request.setAttribute("PRODUCTID", productID);
+                    url = PRODUCT_RECOMMENDATION_CONTROLLER;
                 }
-                request.setAttribute("PRODUCTDETAIL", dto);
-                request.setAttribute("PRODUCTID", productID);
-                url = PRODUCT_RECOMMENDATION_CONTROLLER;
+
             }
         } catch (SQLException ex) {
-            log("ProductDetail_SQL:"+ex.getMessage());
+            log.error("ProductDetail_SQL:" + ex.getMessage());
         } catch (NamingException ex) {
-            log("ProductDetail_Naming:"+ex.getMessage());
-        }finally{
+            log.error("ProductDetail_Naming:" + ex.getMessage());
+        } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);
             out.close();

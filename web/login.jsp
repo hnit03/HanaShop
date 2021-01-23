@@ -58,37 +58,50 @@
     <body>
         <jsp:include page="navbar.jsp"/>
         <div class="container" style="background-color: white;padding: 20px;height: 500px;">
-            <h1 class="text-center">Login</h1>
-            <div class="form">
-                <form action="DispatchServlet" method="POST">
-                    <div class="form-group">
-                        <label>UserID</label>
-                        <input type="text" name="txtUserID" value="${param.txtUserID}" class="form-control" required=""/>
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" name="txtPassword" value="${param.txtPassword}" class="form-control"/>
-                    </div>
-                    <c:set var="error" value="${requestScope.LOGIN_FAILED}"/>
-                    <c:if test="${not empty error}">
-                        <div class="text-center">
-                            <p style="color: red;font-weight: bold">${error}</p>
+            <c:set var="fullname" value="${sessionScope.FULLNAME}"/>
+            <c:if test="${empty fullname}">
+                <h1 class="text-center">Login</h1>
+                <div class="form">
+                    <form action="DispatchServlet" method="POST">
+                        <div class="form-group">
+                            <label>UserID</label>
+                            <input type="text" name="txtUserID" value="${param.txtUserID}" class="form-control" required/>
                         </div>
-                    </c:if>
-                    <input type="submit" value="Login" name="btnAction" class="btn btn-primary form-control"/><br/><br/>
-                    <input type="reset" value="Reset" class="btn btn-danger form-control"/>
-                </form>
-                <br>
-                <div class="text-center">
-                    <button class="loginBtn loginBtn--google">
-                        <a href="https://accounts.google.com/o/oauth2/auth?scope=email&redirect_uri=http://localhost:8084/J3LP0013/LoginWithGoogleServlet&response_type=code
-                           &client_id=406424637817-efgsuneqpjvitod9h0b4b056s1h7ikg1.apps.googleusercontent.com&approval_prompt=force" style="color: white;text-decoration: none">
-                            <i class="fab fa-google mr-2"></i> Sign in with Google
-                        </a>
-                    </button>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" name="txtPassword" value="${param.txtPassword}" class="form-control" required/>
+                        </div>
+                        <c:set var="error" value="${requestScope.LOGIN_FAILED}"/>
+                        <c:if test="${not empty error}">
+                            <div class="text-center">
+                                <p style="color: red;font-weight: bold">${error}</p>
+                            </div>
+                        </c:if>
+                        <input type="submit" value="Login" name="btnAction" class="btn btn-primary form-control"/><br/><br/>
+                        <input type="reset" value="Reset" class="btn btn-danger form-control"/>
+                    </form>
+                    <br>
+                    <div class="text-center">
+                        <button class="loginBtn loginBtn--google">
+                            <a href="https://accounts.google.com/o/oauth2/auth?scope=email&redirect_uri=http://localhost:8084/J3LP0013/LoginWithGoogleServlet&response_type=code
+                               &client_id=406424637817-efgsuneqpjvitod9h0b4b056s1h7ikg1.apps.googleusercontent.com&approval_prompt=force" style="color: white;text-decoration: none">
+                                <i class="fab fa-google mr-2"></i> Sign in with Google
+                            </a>
+                        </button>
+                    </div>
+                    <script src="https://apis.google.com/js/platform.js" async defer></script>
                 </div>
-                <script src="https://apis.google.com/js/platform.js" async defer></script>
-            </div>
+            </c:if>
+            <c:if test="${not empty fullname}">
+                <h1 class="text-center">OPPS, SOME THING WENT WRONG</h1>
+                <p class="text-center">Sorry, the page you were looking for does not exist!</p>
+                <c:url var="home" value="DispatchServlet">
+                    <c:param name="btnAction" value=""/>
+                </c:url>
+                <div class="text-center">
+                    <a href="${home}" class="btn btn-danger">Home Page</a>
+                </div>
+            </c:if>
         </div>
     </body>
 </html>

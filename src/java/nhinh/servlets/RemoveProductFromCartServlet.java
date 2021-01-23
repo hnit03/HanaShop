@@ -38,13 +38,12 @@ public class RemoveProductFromCartServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             /* TODO output your page here. You may use following sample code. */
-            String productIDStr = request.getParameter("productID");
+            String productID = request.getParameter("productID");
             String minus = request.getParameter("minus");
             HttpSession session = request.getSession(false);
             if (session != null) {
                 CartObject cart = (CartObject) session.getAttribute("CUSTCART");
                 if (cart != null) {
-                    int productID = Integer.parseInt(productIDStr);
                     if (minus != null) {
                         cart.minusProductFromCart(productID);
                     } else {

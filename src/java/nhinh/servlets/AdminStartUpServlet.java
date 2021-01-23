@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.ProductDTO;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -27,6 +28,7 @@ import nhinh.dtos.ProductDTO;
 @WebServlet(name = "AdminStartUpServlet", urlPatterns = {"/AdminStartUpServlet"})
 public class AdminStartUpServlet extends HttpServlet {
 
+    private Logger log = Logger.getLogger(AdminStartUpServlet.class.getName());
     private final String START_UP_CONTROLLER = "StartUpServlet";
     private final String ADMIN_PAGE = "adminPage.jsp";
     private final String ERROR_PAGE = "error.jsp";
@@ -54,7 +56,7 @@ public class AdminStartUpServlet extends HttpServlet {
                 if (role) {
                     int pageNo = 1;
                     Object pageNoObj = request.getAttribute("PAGENO");
-                    if (pageNoObj!=null) {
+                    if (pageNoObj != null) {
                         pageNo = (int) pageNoObj;
                     }
                     ProductDAO dao = new ProductDAO();
@@ -69,14 +71,16 @@ public class AdminStartUpServlet extends HttpServlet {
 
                     url = ADMIN_PAGE;
                 }
-            }else{
+            } else {
                 url = START_UP_CONTROLLER;
             }
 
         } catch (SQLException ex) {
-            log("AdminStartUp_SQL: " + ex.getMessage());
+//            log("AdminStartUp_SQL: " + ex.getMessage());
+            log.error(ex.getMessage());
         } catch (NamingException ex) {
-            log("AdminStartUp_Naming: " + ex.getMessage());
+//            log("AdminStartUp_Naming: " + ex.getMessage());
+            log.error(ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

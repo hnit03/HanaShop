@@ -25,59 +25,80 @@
         </c:if>
         <!--Food-->
         <div class="container">
-            <c:set var="productList" value="${requestScope.ALLPRODUCT}"/>
-            <c:if test="${not empty productList}">
-                <div class="row">
-                    <c:forEach var="dto" items="${productList}" varStatus="counter">
-                        <c:url var="moreButton" value="DispatchServlet">
-                            <c:param name="btnAction" value="More"/>
-                            <c:param name="productID" value="${dto.productID}"/>
-                        </c:url>
-                        <div class="col-lg-3 card mb20">
-                            <img src="images/${dto.image}" class="card-img-top mt10" alt="${dto.image}" style="width: 253px; height: 160px">
-                            <div class="card-body">
-                                <h5 class="card-title">${dto.productName}</h5>
-                                <p class="card-text">
-                                    <span style="font-weight: bold;">Price:</span> ${dto.price} VND
-                                </p>
-                                <a href="${moreButton}" class="btn btn-warning form-control">View Details</a>
+            <c:set var="role" value="${sessionScope.ISADMIN}"/>
+            <c:if test="${role == 'false' || empty role}"> 
+                <c:set var="productList" value="${requestScope.ALLPRODUCT}"/>
+                <c:if test="${not empty productList}">
+                    <div class="row">
+                        <c:forEach var="dto" items="${productList}" varStatus="counter">
+                            <c:url var="moreButton" value="DispatchServlet">
+                                <c:param name="btnAction" value="More"/>
+                                <c:param name="productID" value="${dto.productID}"/>
+                            </c:url>
+                            <div class="col-lg-3 card mb20">
+                                <img src="images/${dto.image}" class="card-img-top mt10" alt="${dto.image}" style="width: 253px; height: 160px">
+                                <div class="card-body">
+                                    <h5 class="card-title">${dto.productName}</h5>
+                                    <p class="card-text">
+                                        <span style="font-weight: bold;">Price:</span> $${dto.price}
+                                    </p>
+                                    <a href="${moreButton}" class="btn btn-warning form-control">View Details</a>
+                                </div>
                             </div>
-                        </div>
-                    </c:forEach>
+                        </c:forEach>
+                    </div>
+                    <!--paging-->
+                    <nav aria-label="Page navigation example">
+                        <c:set var="pageNo" value="${requestScope.PAGENO}"/>                   
+                        <c:set var="pageMaxUser" value="${requestScope.PAGE_MAX_USER}"/>
+                        <c:if test="${pageMaxUser > 1}">
+                            <form action="DispatchServlet">
+                                <ul class="pagination justify-content-end">
+                                    <c:if test="${pageNo <= 1}">
+                                        <li class="page-item disabled">
+                                            <input type="submit" value="Previous" name="btnAction" class="page-link"/>
+                                        </li>   
+                                    </c:if>
+                                    <c:if test="${pageNo > 1}">
+                                        <li class="page-item">
+                                            <input type="submit" value="Previous" name="btnAction" class="page-link"/>
+                                        </li>   
+                                    </c:if>
+                                    <c:if test="${pageNo < pageMaxUser}">
+                                        <li class="page-item">
+                                            <input type="submit" value="Next" name="btnAction" class="page-link"/>
+                                        </li>   
+                                    </c:if>   
+                                    <c:if test="${pageNo == pageMaxUser}">
+                                        <li class="page-item disabled">
+                                            <input type="submit" value="Next" name="btnAction" class="page-link"/>
+                                        </li>   
+                                    </c:if>
+                                    <input type="hidden" name="pageNo" value="${pageNo}" />
+                                    <input type="hidden" name="pageView" value="index.jsp" />
+                                </ul>
+                            </form>
+                        </c:if>
+                    </nav>
+                </c:if>
+                <c:if test="${empty productList}">
+                    <div style="background-color: white;padding: 20px;">
+                        <h2 class="text-center">No products</h2>
+                    </div>
+                </c:if>
+            </c:if>
+            <c:if test="${role == 'true'}">
+                <div style="background-color: white;padding: 20px;">
+                    <h1 class="text-center">OPPS, ACCESS DENIED</h1>
+                    <p class="text-center">You don’t have permission to access on this page</p>
+                    <c:url var="home" value="DispatchServlet">
+                        <c:param name="btnAction" value=""/>
+                    </c:url>
+                    <div class="text-center">
+                        <a href="${home}" class="btn btn-danger">Back To Home Page</a>
+                    </div>
                 </div>
-                <!--paging-->
-                <nav aria-label="Page navigation example">
-                    <c:set var="pageNo" value="${requestScope.PAGENO}"/>                   
-                    <c:set var="pageMaxUser" value="${requestScope.PAGE_MAX_USER}"/>
-                    <c:if test="${pageMaxUser > 1}">
-                        <form action="DispatchServlet">
-                            <ul class="pagination justify-content-end">
-                                <c:if test="${pageNo <= 1}">
-                                    <li class="page-item disabled">
-                                        <input type="submit" value="Previous" name="btnAction" class="page-link"/>
-                                    </li>   
-                                </c:if>
-                                <c:if test="${pageNo > 1}">
-                                    <li class="page-item">
-                                        <input type="submit" value="Previous" name="btnAction" class="page-link"/>
-                                    </li>   
-                                </c:if>
-                                <c:if test="${pageNo < pageMaxUser}">
-                                    <li class="page-item">
-                                        <input type="submit" value="Next" name="btnAction" class="page-link"/>
-                                    </li>   
-                                </c:if>   
-                                <c:if test="${pageNo == pageMaxUser}">
-                                    <li class="page-item disabled">
-                                        <input type="submit" value="Next" name="btnAction" class="page-link"/>
-                                    </li>   
-                                </c:if>
-                                <input type="hidden" name="pageNo" value="${pageNo}" />
-                                <input type="hidden" name="pageView" value="index.jsp" />
-                            </ul>
-                        </form>
-                    </c:if>
-                </nav>
+
             </c:if>
         </div>
     </body>

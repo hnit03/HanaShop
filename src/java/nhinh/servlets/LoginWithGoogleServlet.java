@@ -8,8 +8,6 @@ package nhinh.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -23,6 +21,7 @@ import nhinh.accessGoogle.GoogleUtils;
 import nhinh.daos.RegistrationDAO;
 import nhinh.daos.UserDetailsDAO;
 import nhinh.dtos.UserDetailsDTO;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -30,7 +29,9 @@ import nhinh.dtos.UserDetailsDTO;
  */
 @WebServlet(name = "LoginWithGoogleServlet", urlPatterns = {"/LoginWithGoogleServlet"})
 public class LoginWithGoogleServlet extends HttpServlet {
-
+    private Logger log = Logger.getLogger(LoginWithGoogleServlet.class.getName());
+    private final String LOGIN_PAGE = "login.jsp";
+    private final String START_UP_CONTROLLER = "StartUpServlet";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -44,7 +45,7 @@ public class LoginWithGoogleServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String url = "login.jsp";
+        String url = LOGIN_PAGE;
         try {
             /* TODO output your page here. You may use following sample code. */
             String code = request.getParameter("code");
@@ -55,34 +56,34 @@ public class LoginWithGoogleServlet extends HttpServlet {
                 String userID = googlePojo.getEmail();
                 RegistrationDAO dao = new RegistrationDAO();
                 int role = dao.checkLoginWithGoogle(userID);
-                
+
                 boolean isAdmin = false;
                 if (role != -1) {
                     if (role == 0) {
-                        url = "StartUpServlet";
+                        url = START_UP_CONTROLLER;
                         UserDetailsDAO udao = new UserDetailsDAO();
                         UserDetailsDTO udto = udao.getUserDetails(userID);
                         session.setAttribute("USER_DETAILS", udto);
                         session.setAttribute("USERID", userID);
                         isAdmin = false;
                     } else {
-                        url = "StartUpServlet";
+                        url = START_UP_CONTROLLER;
                         isAdmin = true;
                     }
                     session.setAttribute("USERID", userID);
                     session.setAttribute("FULLNAME", dao.getFullname(userID));
                     session.setAttribute("ISADMIN", isAdmin);
-                } 
-                
+                }
+
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(LoginWithGoogleServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("LoginWithGoogle_SQL:" + ex.getMessage());
         } catch (NamingException ex) {
-            Logger.getLogger(LoginWithGoogleServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("LoginWithGoogle_Namings:" + ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
-                rd.forward(request, response);
+            rd.forward(request, response);
             out.close();
         }
     }

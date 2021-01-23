@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -21,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.ProductDTO;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -31,6 +30,7 @@ public class SearchShoppingHistoryServlet extends HttpServlet {
 
     private final String START_UP_CONTROLLER = "StartUpServlet";
     private final String SEARCH_HISTORY_PAGE = "searchHistory.jsp";
+    private Logger log = Logger.getLogger(SearchShoppingHistoryServlet.class.getName());
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -50,7 +50,6 @@ public class SearchShoppingHistoryServlet extends HttpServlet {
             /* TODO output your page here. You may use following sample code. */
             String name = request.getParameter("txtSearchName");
             String date = request.getParameter("date");
-            System.out.println(date + "111");
             if (!name.trim().isEmpty() || !date.isEmpty()) {
                 HttpSession session = request.getSession(false);
                 Object roleObj = session.getAttribute("ISADMIN");
@@ -61,17 +60,21 @@ public class SearchShoppingHistoryServlet extends HttpServlet {
                         if (userIDObj != null) {
                             String userID = (String) userIDObj;
                             ProductDAO dao = new ProductDAO();
-                            Map<ProductDTO,String> result = dao.searchShoppingHistory(userID, name, date);
+                            Map<ProductDTO, String> result = dao.searchShoppingHistory(userID, name, date);
                             request.setAttribute("SEARCH_HISTORY", result);
                             url = SEARCH_HISTORY_PAGE;
                         }
                     }
                 }
+            } else {
+                url = SEARCH_HISTORY_PAGE;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(SearchShoppingHistoryServlet.class.getName()).log(Level.SEVERE, null, ex);
+//            log("SearchShoppingHistory_SQL:" +ex.getMessage());
+            log.error("SearchShoppingHistory_SQL:" +ex.getMessage());
         } catch (NamingException ex) {
-            Logger.getLogger(SearchShoppingHistoryServlet.class.getName()).log(Level.SEVERE, null, ex);
+//            log("SearchShoppingHistory_Naming:" + ex.getMessage());
+            log.error("SearchShoppingHistory_Naming:" +ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

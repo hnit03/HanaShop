@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.ProductDTO;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -29,7 +30,7 @@ public class SearchProductServlet extends HttpServlet {
 
     private final String SEARCH_PAGE = "searchProduct.jsp";
     private final String ADMIN_SEARCH_PAGE = "searchProductByAdmin.jsp";
-
+    private Logger log = Logger.getLogger(SearchProductServlet.class.getName());
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -48,7 +49,7 @@ public class SearchProductServlet extends HttpServlet {
         String priceMinStr = request.getParameter("txtPriceMin");
         String priceMaxStr = request.getParameter("txtPriceMax");
         int priceMin = 0;
-        int priceMax = 10000000;
+        int priceMax = 1000;
         String url = SEARCH_PAGE;
         int pageNo = 1;
         try {
@@ -97,9 +98,9 @@ public class SearchProductServlet extends HttpServlet {
             }
 
         } catch (SQLException ex) {
-            log("Search_SQL: " + ex.getMessage());
+            log.error("Search_SQL: " + ex.getMessage());
         } catch (NamingException ex) {
-            log("Search_Naming: " + ex.getMessage());
+            log.error("Search_Naming: " + ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

@@ -8,10 +8,7 @@ package nhinh.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -22,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.ProductDTO;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -30,7 +28,8 @@ import nhinh.dtos.ProductDTO;
 @WebServlet(name = "ShoppingHistoryServlet", urlPatterns = {"/ShoppingHistoryServlet"})
 public class ShoppingHistoryServlet extends HttpServlet {
     private final String SHOPPING_HISTORY_PAGE = "shoppingHistory.jsp"; 
-    private final String LOGIN_PAGE = "login.jsp"; 
+    private final String START_UP_CONTROLLER = "StartUpServlet"; 
+    private Logger log = Logger.getLogger(ShoppingHistoryServlet.class.getName());
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -44,7 +43,7 @@ public class ShoppingHistoryServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String url = LOGIN_PAGE;
+        String url = START_UP_CONTROLLER;
         try {
             /* TODO output your page here. You may use following sample code. */
             HttpSession session = request.getSession(false);
@@ -63,9 +62,9 @@ public class ShoppingHistoryServlet extends HttpServlet {
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(ShoppingHistoryServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("ShoppingHistory_SQL:" +ex.getMessage());
         } catch (NamingException ex) {
-            Logger.getLogger(ShoppingHistoryServlet.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("ShoppingHistory_Naming:" +ex.getMessage());
         }finally{
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

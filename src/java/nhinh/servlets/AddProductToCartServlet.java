@@ -8,6 +8,7 @@ package nhinh.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Map;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -45,15 +46,14 @@ public class AddProductToCartServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String productIDStr = request.getParameter("productID");
+        String productID = request.getParameter("productID");
         String amountStr = request.getParameter("txtAmount");
         String url = ERROR_PAGE;
         int amount = 0;
         int numOfProduct = 0;
         try {
             /* TODO output your page here. You may use following sample code. */
-            if (productIDStr != null) {
-                int productID = Integer.parseInt(productIDStr);
+            if (productID != null) {
                 if (amountStr != null && amountStr.matches("[0-9]+")) {
                     amount = Integer.parseInt(amountStr);
                 }
@@ -69,7 +69,7 @@ public class AddProductToCartServlet extends HttpServlet {
                     } else {
                         CartObject cart = (CartObject) session.getAttribute("CUSTCART");
                         Object temp = (Object) session.getAttribute("NUM_OF_PRODUCT");
-                        if (temp !=null) {
+                        if (temp != null) {
                             numOfProduct = (int) temp;
                         }
                         if (cart == null) {
@@ -86,7 +86,7 @@ public class AddProductToCartServlet extends HttpServlet {
                             String plus = request.getParameter("plus");
                             int quantity = 0;
                             for (ProductDTO pdto : cart.getProducts().keySet()) {
-                                if (productID == pdto.getProductID()) {
+                                if (productID.equals(pdto.getProductID())) {
                                     quantity = cart.getProducts().get(pdto);
                                     break;
                                 }
@@ -96,7 +96,7 @@ public class AddProductToCartServlet extends HttpServlet {
                                 request.setAttribute("OUT_OF_STOCK", "true");
                                 request.setAttribute("QUANTITY_IN_STOCK", quantityInStock);
                                 for (ProductDTO pdto : cart.getProducts().keySet()) {
-                                    if (productID == pdto.getProductID()) {
+                                    if (productID.equals(pdto.getProductID())) {
                                         cart.getProducts().replace(pdto, quantityInStock);
                                         break;
                                     }
@@ -109,12 +109,26 @@ public class AddProductToCartServlet extends HttpServlet {
                                     url = VIEW_CART_PAGE;
                                 } else {
                                     if (amount <= quantityInStock) {
-                                        cart.addProductToCart(dto, amount);
-                                        session.setAttribute("CUSTCART", cart);
-                                        request.setAttribute("ADD_SUCCESS", true);
-                                        numOfProduct += 1;
-                                        session.setAttribute("NUM_OF_PRODUCT", numOfProduct);
-                                        url = START_UP_CONTROLLER;
+                                        int amountInCart = 0;
+                                        for (Map.Entry<ProductDTO, Integer> en : cart.getProducts().entrySet()) {
+                                            if (en.getKey().getProductID().equals(productID)) {
+                                                amountInCart = en.getValue();
+                                                break;
+                                            }
+                                        }
+                                        int totalAmount = amountInCart + amount;
+                                        if (totalAmount <= quantityInStock) {
+                                            cart.addProductToCart(dto, amount);
+                                            session.setAttribute("CUSTCART", cart);
+                                            request.setAttribute("ADD_SUCCESS", true);
+                                            numOfProduct += 1;
+                                            session.setAttribute("NUM_OF_PRODUCT", numOfProduct);
+                                            url = START_UP_CONTROLLER;
+                                        }else{
+                                            request.setAttribute("MAXIMUM_AMOUNT", "The " + dto.getProductName() + " was added in maximum quantity.");
+                                            url = "DispatchServlet?btnAction=More&productID="+productID;
+                                        }
+
                                     }
                                 }
                             }

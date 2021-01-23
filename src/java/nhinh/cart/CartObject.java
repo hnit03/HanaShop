@@ -25,10 +25,9 @@ public class CartObject {
         if (this.products == null) {
             this.products = new HashMap<>();
         }
-
         boolean isExist = false;
         for (ProductDTO pDTO : products.keySet()) {
-            if (dto.getProductID() == pDTO.getProductID()) {
+            if (dto.getProductID().equals(pDTO.getProductID())) {
                 int quantity = this.products.get(pDTO);
                 quantity = this.products.get(pDTO) + amount;
                 this.products.replace(pDTO, quantity);
@@ -41,12 +40,12 @@ public class CartObject {
         }
     }
 
-    public void increaseProductToCart(int productID) {
+    public void increaseProductToCart(String productID) {
         if (this.products == null) {
             return;
         }
         for (ProductDTO pDTO : products.keySet()) {
-            if (pDTO.getProductID() == productID) {
+            if (pDTO.getProductID().equals( productID)) {
                 int quantity = this.products.get(pDTO);
                 if (quantity < pDTO.getQuantity()) {
                     quantity = this.products.get(pDTO) + 1;
@@ -57,12 +56,12 @@ public class CartObject {
         }
     }
 
-    public void minusProductFromCart(int productID) {
+    public void minusProductFromCart(String productID) {
         if (this.products == null) {
             return;
         }
         for (ProductDTO pDTO : products.keySet()) {
-            if (pDTO.getProductID() == productID) {
+            if (pDTO.getProductID().equals(productID)) {
                 int quantity = this.products.get(pDTO);
                 if (quantity > 1) {
                     quantity = this.products.get(pDTO) - 1;
@@ -73,12 +72,12 @@ public class CartObject {
         }
     }
 
-    public void removeProductFromCart(int productID) {
+    public void removeProductFromCart(String productID) {
         if (this.products == null) {
             return;
         }
         for (ProductDTO pdto : products.keySet()) {
-            if (pdto.getProductID() == productID) {
+            if (pdto.getProductID().equals(productID)) {
                 this.products.remove(pdto);
                 if (this.products.isEmpty()) {
                     this.products = null;

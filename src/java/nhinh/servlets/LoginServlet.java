@@ -19,6 +19,7 @@ import javax.servlet.http.HttpSession;
 import nhinh.daos.RegistrationDAO;
 import nhinh.daos.UserDetailsDAO;
 import nhinh.dtos.UserDetailsDTO;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -29,6 +30,7 @@ public class LoginServlet extends HttpServlet {
 
     private final String INVALID = "login.jsp";
     private final String START_UP_CONTROLLER = "StartUpServlet";
+    private Logger log = Logger.getLogger(LoginServlet.class.getName());
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -68,18 +70,18 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("FULLNAME", dao.getFullname(userID));
                     session.setAttribute("ISADMIN", isAdmin);
                     response.sendRedirect(url);
-                } else{
+                } else {
                     request.setAttribute("LOGIN_FAILED", "Invalid userID or password.");
                     RequestDispatcher rd = request.getRequestDispatcher(url);
                     rd.forward(request, response);
                 }
             }
         } catch (SQLException ex) {
-            log("Login_SQLEx: " + ex.getMessage());
+            log.error("Login_SQLEx: " + ex.getMessage());
         } catch (NamingException ex) {
-            log("Login_NamingEx: " + ex.getMessage());
+            log.error("Login_NamingEx: " + ex.getMessage());
         } finally {
-            
+
             out.close();
         }
     }

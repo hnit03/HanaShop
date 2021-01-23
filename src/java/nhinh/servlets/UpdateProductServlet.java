@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -25,8 +23,8 @@ import nhinh.daos.ProductDAO;
 import nhinh.daos.ProductHistoryDAO;
 import nhinh.dtos.CategoryDTO;
 import nhinh.dtos.ProductDTO;
-import nhinh.dtos.ProductHistoryDTO;
 import nhinh.utils.Utils;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -34,6 +32,9 @@ import nhinh.utils.Utils;
  */
 @WebServlet(name = "UpdateProductServlet", urlPatterns = {"/UpdateProductServlet"})
 public class UpdateProductServlet extends HttpServlet {
+
+    private final String START_UP_CONTROLLER = "StartUpServlet";
+    private Logger log = Logger.getLogger(UpdateProductServlet.class.getName());
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -48,25 +49,24 @@ public class UpdateProductServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String productIDStr = request.getParameter("productID");
+        String productID = request.getParameter("productID");
         String categoryName = request.getParameter("cboCategory");
         String updateDetail = request.getParameter("updateDetail");
         String statusStr = request.getParameter("cboStatus");
         boolean status = false;
+        String url = START_UP_CONTROLLER;
         try {
-            if (statusStr.equals("Active")) {
-                status = true;
-            }
-            /* TODO output your page here. You may use following sample code. */
-            int productID = 0;
-            if (productIDStr != null) {
-                productID = Integer.parseInt(productIDStr);
+            HttpSession session = request.getSession(false);
+
+            if (statusStr != null) {
+                if (statusStr.equals("Active")) {
+                    status = true;
+                }
             }
             CategoryDAO cdao = new CategoryDAO();
             CategoryDTO cdto = cdao.getCategoryDTO(categoryName);
             ProductDAO pdao = new ProductDAO();
             Utils utils = new Utils();
-            HttpSession session = request.getSession(false);
             String userID = "";
             Object userIDObj = session.getAttribute("USERID");
             if (userIDObj != null) {
@@ -107,7 +107,13 @@ public class UpdateProductServlet extends HttpServlet {
                 }
                 int lastIndex = img.lastIndexOf(".");
                 String ext = "." + img.substring(lastIndex + 1);
-                img = productName.trim() + ext;
+                String imageName = "";
+                if (productName.contains(" ")) {
+                    imageName = utils.formatImageName(productName);
+                    img = imageName + ext;
+                } else {
+                    img = productName + ext;
+                }
                 String description = request.getParameter("txtDescription");
                 String priceStr = request.getParameter("txtPrice");
                 String quantityStr = request.getParameter("txtQuantity");
@@ -133,11 +139,13 @@ public class UpdateProductServlet extends HttpServlet {
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UpdateProductServlet.class.getName()).log(Level.SEVERE, null, ex);
+//            log("UpdateProduct_SQL:" + ex.getMessage());
+            log.error("UpdateProduct_SQL:" +ex.getMessage());
         } catch (NamingException ex) {
-            Logger.getLogger(UpdateProductServlet.class.getName()).log(Level.SEVERE, null, ex);
+//            log("UpdateProduct_Naming:" + ex.getMessage());
+            log.error("UpdateProduct_Naming:" +ex.getMessage());
         } finally {
-            RequestDispatcher rd = request.getRequestDispatcher("AdminStartUpServlet");
+            RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);
             out.close();
         }

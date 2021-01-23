@@ -17,6 +17,11 @@
     </head>
     <body>
         <jsp:include page="navbar.jsp"/>
+        <c:if test="${not empty requestScope.OUT_OF_STOCK}">
+            <script>
+                alert('${requestScope.OUT_OF_STOCK}');
+            </script>
+        </c:if>
         <div class="container" style="background-color: white;padding: 20px;min-height: 400px;">
             <c:set var="cart" value="${sessionScope.CUSTCART}"/>
             <c:if test="${not empty cart}">
@@ -86,7 +91,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Phone</label>
-                                <input type="text" name="txtPhone" value="${user.phone}" class="form-control"/>
+                                <input type="number" name="txtPhone" value="${user.phone}" class="form-control"/>
                             </div>
                             <div class="form-group">
                                 <label>Address</label>

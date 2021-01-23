@@ -31,7 +31,7 @@ public class ProductHistoryDAO implements Serializable{
                 String sql = "Insert into ProductHistory(HistoryID,productID,userID,action,date) "
                         + "values(NEWID(),?,?,?,?)";
                 ps = con.prepareStatement(sql);
-                ps.setInt(1, dTO.getProductID());
+                ps.setString(1, dTO.getProductID());
                 ps.setString(2, userID);
                 ps.setString(3, action);
                 ps.setString(4, date);
@@ -72,7 +72,7 @@ public class ProductHistoryDAO implements Serializable{
                 
                 while (rs.next()) {
                     String historyID = rs.getString("historyID");
-                    int productID = rs.getInt("productID");
+                    String productID = rs.getString("productID");
                     ProductDTO pdto = dao.getProductDTO(productID);
                     String userID = rs.getString("userID");
                     String action = rs.getString("action");

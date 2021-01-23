@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.UUID;
 import javax.servlet.http.Part;
 
 /*
@@ -52,7 +51,9 @@ public class Utils {
         OutputStream os = null;
         try {
             File outputFilePath = new File(path + fileName);
-            outputFilePath.createNewFile();
+            if (!outputFilePath.exists()) {
+                outputFilePath.createNewFile();
+            }
             is = part.getInputStream();
             os = new FileOutputStream(outputFilePath);
             int read = 0;
@@ -69,9 +70,10 @@ public class Utils {
             }
         }
     }
-
-    public String getRandomID() {
-        UUID uuid = UUID.randomUUID();
-        return uuid.toString();
+    public String formatImageName(String name){
+        for (int i = 0; i < name.length(); i++) {
+            name = name.replace(" ", "");
+        }
+        return  name;
     }
 }

@@ -8,8 +8,6 @@ package nhinh.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -17,8 +15,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.ProductDTO;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -26,6 +26,11 @@ import nhinh.dtos.ProductDTO;
  */
 @WebServlet(name = "GetProductToUpdateDetailServlet", urlPatterns = {"/GetProductToUpdateDetailServlet"})
 public class GetProductToUpdateDetailServlet extends HttpServlet {
+
+    private final String ADMIN_START_UP_CONTROLLER = "AdminStartUpServlet";
+    private final String START_UP_CONTROLLER = "StartUpServlet";
+    private final String UPDATE_DETAIL_PAGE = "updateDetail.jsp";
+    private Logger log = Logger.getLogger(GetProductToUpdateDetailServlet.class.getName());
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,21 +45,32 @@ public class GetProductToUpdateDetailServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String productIDStr = request.getParameter("productID");
-        String url = "AdminStartUpServlet";
+        String productID = request.getParameter("productID");
+        String url = START_UP_CONTROLLER;
         try {
-            ProductDAO dao = new ProductDAO();
-            int productID = Integer.parseInt(productIDStr);
-            ProductDTO dto = dao.getProductDTOByAdmin(productID);
-            if (dto!=null) {
-                request.setAttribute("PRODUCT", dto);
-                url = "updateDetail.jsp";
+            HttpSession session = request.getSession(false);
+            Object roleObj = session.getAttribute("ISADMIN");
+            if (roleObj != null) {
+                boolean role = (boolean) roleObj;
+                if (role) {
+                    ProductDAO dao = new ProductDAO();
+                    ProductDTO dto = dao.getProductDTOByAdmin(productID);
+                    if (dto != null) {
+                        request.setAttribute("PRODUCT", dto);
+                        url = UPDATE_DETAIL_PAGE;
+                    } else {
+                        url = ADMIN_START_UP_CONTROLLER;
+                    }
+                }
             }
+
         } catch (SQLException ex) {
-            Logger.getLogger(GetProductToUpdateDetailServlet.class.getName()).log(Level.SEVERE, null, ex);
+//            log("GetProductToUpdateDetail_SQL:" + ex.getMessage());
+            log.error(ex.getMessage());
         } catch (NamingException ex) {
-            Logger.getLogger(GetProductToUpdateDetailServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }finally{
+//            log("GetProductToUpdateDetail_Naming:" + ex.getMessage());
+            log.error(ex.getMessage());
+        } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);
             out.close();

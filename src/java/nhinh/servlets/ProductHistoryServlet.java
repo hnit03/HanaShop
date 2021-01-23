@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -21,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import nhinh.daos.ProductHistoryDAO;
 import nhinh.dtos.ProductHistoryDTO;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -31,7 +30,7 @@ public class ProductHistoryServlet extends HttpServlet {
 
     private final String START_UP_CONTROLLER = "StartUpServlet";
     private final String PRODUCT_HISTORY_PAGE = "productHistory.jsp";
-
+    private Logger log = Logger.getLogger(ProductHistoryServlet.class.getName());
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -51,7 +50,6 @@ public class ProductHistoryServlet extends HttpServlet {
             HttpSession session = request.getSession(false);
             Object roleObject = session.getAttribute("ISADMIN");
             if (roleObject != null) {
-
                 boolean role = (boolean) roleObject;
                 if (role) {
                     Object userIDObj = session.getAttribute("USERID");
@@ -62,15 +60,13 @@ public class ProductHistoryServlet extends HttpServlet {
                         List<ProductHistoryDTO> list = dao.getProductHistoryList();
                         request.setAttribute("LIST_PRODUCT_HISTORY", list);
                         url = PRODUCT_HISTORY_PAGE;
-
                     }
-
                 }
             }
         } catch (SQLException ex) {
-            
+            log.error("ProductHistory_SQL:" + ex.getMessage());
         } catch (NamingException ex) {
-
+            log.error("ProductHistory_Naming:" + ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

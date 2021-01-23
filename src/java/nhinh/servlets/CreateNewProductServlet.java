@@ -16,12 +16,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import nhinh.daos.CategoryDAO;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.CategoryDTO;
-import nhinh.dtos.ProductDTO;
 import nhinh.utils.Utils;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -32,6 +33,8 @@ public class CreateNewProductServlet extends HttpServlet {
 
     private final String CREATE_PRODUCT_PAGE = "createNewProduct.jsp";
     private final String ADMIN_START_UP_CONTROLLER = "AdminStartUpServlet";
+    private final String START_UP_CONTROLLER = "StartUpServlet";
+    private Logger log = Logger.getLogger(CreateNewProductServlet.class.getName());
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -56,36 +59,52 @@ public class CreateNewProductServlet extends HttpServlet {
         String url = CREATE_PRODUCT_PAGE;
         Utils utils = new Utils();
         try {
-            ProductDAO pdao = new ProductDAO();
-            int productID = pdao.getLastProduct();
-            if (productID == 0) {
-                productID = 10000;
-            } else {
-                productID++;
+            HttpSession session = request.getSession(false);
+            Object roleObj = session.getAttribute("ISADMIN");
+            if (roleObj != null) {
+                boolean role = (boolean) roleObj;
+                if (role) {
+                    ProductDAO pdao = new ProductDAO();
+                    if (pdao.checkDupName(productName)) {
+                        request.setAttribute("ERROR_PRODUCTNAME", "This name is duplicated.");
+                        url = CREATE_PRODUCT_PAGE;
+                    } else {
+                        int quantity = Integer.parseInt(quantityStr);
+                        float price = Float.parseFloat(priceStr);
+                        Part filePart = request.getPart("file");
+                        String img = filePart.getSubmittedFileName();
+                        int lastIndex = img.lastIndexOf(".");
+                        String ext = "." + img.substring(lastIndex + 1);
+                        String imageName = "";
+                        if (productName.contains(" ")) {
+                            imageName = utils.formatImageName(productName);
+                            img = imageName + ext;
+                        } else {
+                            img = productName + ext;
+                        }
+                        String createDate = utils.formatDateToString(newDate);
+                        CategoryDAO cdao = new CategoryDAO();
+                        CategoryDTO cdto = cdao.getCategoryDTO(category);
+                        boolean isCreate = pdao.createNewProduct(productName, img, description, price, createDate, cdto, true, quantity);
+                        if (isCreate) {
+                            String realPath = request.getServletContext().getRealPath("/");
+                            realPath = realPath + "images/";
+                            utils.storeFile(realPath, img, filePart);
+                            url = ADMIN_START_UP_CONTROLLER;
+                            request.setAttribute("CREATE_SUCCESSFULLY", true);
+                        }
+                    }
+                } else {
+                    url = START_UP_CONTROLLER;
+                }
             }
-            int quantity = Integer.parseInt(quantityStr);
-            float price = Float.parseFloat(priceStr);
-            Part filePart = request.getPart("file");
-            String img = filePart.getSubmittedFileName();
-            int lastIndex = img.lastIndexOf(".");
-            String ext = "." + img.substring(lastIndex + 1);
-            img = productName + ext;
-            String createDate = utils.formatDateToString(newDate);
-            CategoryDAO cdao = new CategoryDAO();
-            CategoryDTO cdto = cdao.getCategoryDTO(category);
-            ProductDTO dto = new ProductDTO(productID, productName, img, description, price, createDate, cdto, true, quantity);
-            boolean isCreate = pdao.createNewProduct(dto);
-            if (isCreate) {
-                String realPath = request.getServletContext().getRealPath("/");
-                realPath = realPath + "images/";
-                utils.storeFile(realPath, img, filePart);
-                url = ADMIN_START_UP_CONTROLLER;
-                request.setAttribute("CREATE_SUCCESSFULLY", true);
-            }
+
         } catch (SQLException ex) {
-            log("CreateNewProduct_SQL:" + ex.getMessage());
+//            log("CreateNewProduct_SQL:" + ex.getMessage());
+            log.error("CreateNewProduct_SQL:" +ex.getMessage());
         } catch (NamingException ex) {
-            log("CreateNewProduct_Naming:" + ex.getMessage());
+//            log("CreateNewProduct_Naming:" + ex.getMessage());
+            log.error("CreateNewProduct_Naming:" +ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

@@ -18,38 +18,50 @@
     <body>
         <jsp:include page="navbar.jsp"/>
         <div class="container" style="background-color: white;padding: 20px;">
-            <c:set var="listHistory" value="${requestScope.LIST_PRODUCT_HISTORY}"/>
-            <c:if test="${not empty listHistory}">
-                <table class="table" >
-                    <c:forEach var="product" items="${listHistory}" varStatus="counter">
-                        <tbody>
-                            <tr >
-                                <td >
-                                    <img src="images/${product.productDTO.image}" alt="${product.productDTO.image}" style="width: 150px; height: 150px;max-height: 100%">
-                                </td>
-                                <td style="width: 160px;">
-                                    <h4>${product.productDTO.productID}</h4>
-                                </td>
-                                <td>
-                                    <h5>${product.action}</h5>
-                                </td>
-                                <td>
-                                    <h5>${product.date}</h5>
-                                </td>
-                            </tr>
-                        </tbody>
+            <c:set var="role" value="${sessionScope.ISADMIN}"/>
+            <c:if test="${role == 'true'}"> 
+                <c:set var="listHistory" value="${requestScope.LIST_PRODUCT_HISTORY}"/>
+                <c:if test="${not empty listHistory}">
+                    <table class="table" >
+                        <c:forEach var="product" items="${listHistory}" varStatus="counter">
+                            <tbody>
+                                <tr >
+                                    <td >
+                                        <img src="images/${product.productDTO.image}" alt="${product.productDTO.image}" style="width: 150px; height: 150px;max-height: 100%">
+                                    </td>
+                                    <td style="width: 160px;">
+                                        <h4>${product.productDTO.productName}</h4>
+                                    </td>
+                                    <td>
+                                        <h5>${product.action}</h5>
+                                    </td>
+                                    <td>
+                                        <h5>${product.date}</h5>
+                                    </td>
+                                </tr>
+                            </tbody>
 
-                    </c:forEach>
-                </table>
+                        </c:forEach>
+                    </table>
+                </c:if>
+                <c:if test="${empty listHistory}">
+                    <div class="text-center">
+                        <h2>No history</h2>
+                        <c:url var="home" value="DispatchServlet">
+                            <c:param name="btnAction" value=""/>
+                        </c:url>
+                        <a href="${home}" class="btn btn-danger">Back To Home Page</a>
+                    </div>
+                </c:if>
             </c:if>
-            <c:if test="${empty listHistory}">
+            <c:if test="${role == 'false' || empty role}">
+                <h1 class="text-center">OPPS, ACCESS DENIED</h1>
+                <p class="text-center">You don’t have permission to access on this page</p>
+                <c:url var="home" value="DispatchServlet">
+                    <c:param name="btnAction" value=""/>
+                </c:url>
                 <div class="text-center">
-                    <h2>No history</h2>
-                    <p>Please shop now</p>
-                    <c:url var="shopping" value="DispatchServlet">
-                        <c:param name="btnAction" value=""/>
-                    </c:url>
-                    <a href="${shopping}" class="btn btn-warning">Shopping</a>
+                    <a href="${home}" class="btn btn-danger">Back To Home Page</a>
                 </div>
             </c:if>
         </div>

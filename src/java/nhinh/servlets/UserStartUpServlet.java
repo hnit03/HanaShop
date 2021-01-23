@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import nhinh.daos.ProductDAO;
 import nhinh.dtos.ProductDTO;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -27,6 +28,7 @@ import nhinh.dtos.ProductDTO;
 public class UserStartUpServlet extends HttpServlet {
 
     private final String HOME_PAGE = "index.jsp";
+    private Logger log = Logger.getLogger(UserStartUpServlet.class.getName());
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -55,9 +57,9 @@ public class UserStartUpServlet extends HttpServlet {
             List<ProductDTO> result = dao.getProductList();
             request.setAttribute("ALLPRODUCT", result);
         } catch (SQLException ex) {
-            log("UserStartUp_SQL: " + ex.getMessage());
+            log.error("UserStartUp_SQL: " + ex.getMessage());
         } catch (NamingException ex) {
-            log("UserStartUp_Naming: " + ex.getMessage());
+            log.error("UserStartUp_Naming: " + ex.getMessage());
         } finally {
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);

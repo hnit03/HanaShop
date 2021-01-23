@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @author PC
  */
 public class ProductDTO implements Serializable{
-    private int productID;
+    private String productID;
     private String productName;
     private String image;
     private String description;
@@ -25,7 +25,7 @@ public class ProductDTO implements Serializable{
     public ProductDTO() {
     }
 
-    public ProductDTO(int productID, String productName, String image, float price, CategoryDTO cdto) {
+    public ProductDTO(String productID, String productName, String image, float price, CategoryDTO cdto) {
         this.productID = productID;
         this.productName = productName;
         this.image = image;
@@ -34,7 +34,7 @@ public class ProductDTO implements Serializable{
     }
 
     
-    public ProductDTO( int productID,String productName, String image, String description, float price, String createDate, CategoryDTO cdto, boolean status, int quantity) {
+    public ProductDTO( String productID,String productName, String image, String description, float price, String createDate, CategoryDTO cdto, boolean status, int quantity) {
         this.productID=productID;
         this.productName = productName;
         this.image = image;
@@ -162,14 +162,14 @@ public class ProductDTO implements Serializable{
     /**
      * @return the productID
      */
-    public int getProductID() {
+    public String getProductID() {
         return productID;
     }
 
     /**
      * @param productID the productID to set
      */
-    public void setProductID(int productID) {
+    public void setProductID(String productID) {
         this.productID = productID;
     }
     

@@ -16,152 +16,169 @@
         <link rel="stylesheet" href="css/styles.css">
     </head>
     <body>
-        <jsp:include page="searchForm.jsp"/>
+        <c:set var="role" value="${sessionScope.ISADMIN}"/>
+        <jsp:include page="navbar.jsp"/>
+        <c:if test="${role == 'true'}"> 
+            <jsp:include page="searchForm.jsp"/>
+        </c:if>
         <div style="background-color: white;
              padding: 20px; width: 100%;
              margin-top: -20px;">
-            <c:url var="create" value="DispatchServlet">
-                <c:param name="btnAction" value="Create"/>
-            </c:url>
 
-            <a href="${create}" class="btn btn-primary">
-                <i class="fas fa-plus"></i>Create New Food
-            </a>
-            <br/><br/>
-            <c:set var="productList" value="${requestScope.PRODUCTSEARCH}"/>
-            <c:if test="${not empty productList}">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col" style="width: 120px;">Name</th>
-                            <th scope="col" style="width: 160px;">Image</th>
-                            <th scope="col" style="width: 100px;">Price</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Create Date</th>
-                            <th scope="col" style="width: 130px;">Category</th>
-                            <th scope="col" style="width: 130px;">Status</th>
-                            <th scope="col" style="width: 100px;">Quantity</th>
-                            <th scope="col" ></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:if test="${not empty productList}">
-                            <c:forEach var="dto" items="${productList}" varStatus="counter">
-                                <tr>
-                                    <td style="width: 120px;">${dto.productName}</td>
-                                    <td>
-                                        <img src="images/${dto.image}" alt="${dto.image}" style="width: 160px;height: 100px"/>
-                                    </td>
-                                    <td>
-                                        ${dto.price}
-                                    </td>
-                                    <td>
-                                        ${dto.description}
-                                    </td>
-                                    <td>
-                                        ${dto.createDate}
-                                    </td>
-                                    <td>
-                                        <c:set var="categoryList" value="${applicationScope.CATEGORY}"/>
-                                        <form action="DispatchServlet">
-                                            <select class="form-control" name="cboCategory">
-                                                <c:if test="${not empty categoryList}">
-                                                    <c:forEach var="cate" items="${categoryList}" varStatus="counter">
-                                                        <option value="${cate.categoryName}"
-                                                                <c:if test="${cate.categoryName == dto.cdto.categoryName}">
-                                                                    selected
-                                                                </c:if>
-                                                                >${cate.categoryName}</option>
-                                                    </c:forEach>
-                                                </c:if>
-                                            </select>
-                                            <input type="submit" value="Update" name="btnAction" class="btn btn-warning form-control"/>
-                                            <input type="hidden" name="productID" value="${dto.productID}" />
-                                            <input type="hidden" name="cboCategory" value="${cboCategory}" />
-                                            <input type="hidden" name="cboStatus" value="${dto.status}" />
-                                            <input type="hidden" name="updateDetail" value="false" />
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <c:set var="listStatus" value="${applicationScope.STATUS_LIST}"/>
-                                        <form action="DispatchServlet">
-                                            <c:if test="${not empty listStatus}">
-                                                <select name="cboStatus" class="form-control">
-                                                    <c:if test="${not empty listStatus}">
-                                                        <c:forEach var="status" items="${listStatus}" varStatus="counter">
-                                                            <option value="${status}"
-                                                                    <c:if test="${status == dto.status}">
+            <c:if test="${role == 'true'}"> 
+                <c:url var="create" value="DispatchServlet">
+                    <c:param name="btnAction" value="Create"/>
+                </c:url>
+
+                <a href="${create}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>Create New Food
+                </a>
+                <br/><br/>
+                <c:set var="productList" value="${requestScope.PRODUCTSEARCH}"/>
+                <c:if test="${not empty productList}">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 120px;">Name</th>
+                                <th scope="col" style="width: 160px;">Image</th>
+                                <th scope="col" style="width: 100px;">Price</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Create Date</th>
+                                <th scope="col" style="width: 130px;">Category</th>
+                                <th scope="col" style="width: 130px;">Status</th>
+                                <th scope="col" style="width: 100px;">Quantity</th>
+                                <th scope="col" ></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:if test="${not empty productList}">
+                                <c:forEach var="dto" items="${productList}" varStatus="counter">
+                                    <tr>
+                                        <td style="width: 120px;">${dto.productName}</td>
+                                        <td>
+                                            <img src="images/${dto.image}" alt="${dto.image}" style="width: 160px;height: 100px"/>
+                                        </td>
+                                        <td>
+                                            ${dto.price}
+                                        </td>
+                                        <td>
+                                            ${dto.description}
+                                        </td>
+                                        <td>
+                                            ${dto.createDate}
+                                        </td>
+                                        <td>
+                                            <c:set var="categoryList" value="${applicationScope.CATEGORY}"/>
+                                            <form action="DispatchServlet">
+                                                <select class="form-control" name="cboCategory">
+                                                    <c:if test="${not empty categoryList}">
+                                                        <c:forEach var="cate" items="${categoryList}" varStatus="counter">
+                                                            <option value="${cate.categoryName}"
+                                                                    <c:if test="${cate.categoryName == dto.cdto.categoryName}">
                                                                         selected
                                                                     </c:if>
-                                                                    >${status}</option>
+                                                                    >${cate.categoryName}</option>
                                                         </c:forEach>
                                                     </c:if>
                                                 </select>
-                                            </c:if>
-                                            <input type="submit" value="Update" name="btnAction" class="btn btn-warning form-control"/>
-                                            <input type="hidden" name="productID" value="${dto.productID}" />
-                                            <input type="hidden" name="cboCategory" value="${dto.cdto.categoryName}" />
-                                            <input type="hidden" name="cboStatus" value="${cboStatus}" />
-                                            <input type="hidden" name="updateDetail" value="false" />
-                                        </form>
-                                    </td>
-                                    <td
-                                        >${dto.quantity}
-                                    </td>
-                                    <td>
-                                        <c:url var="updateDetail" value="DispatchServlet">
-                                            <c:param name="btnAction" value="Update Detail"/>
-                                            <c:param name="productID" value="${dto.productID}"/>
-                                        </c:url>
-                                        <a href="${updateDetail}" class="btn btn-warning form-control" >Update Detail</a>
-                                    </td>
-                                </tr>
-                            </c:forEach>
+                                                <input type="submit" value="Update" name="btnAction" class="btn btn-warning form-control"/>
+                                                <input type="hidden" name="productID" value="${dto.productID}" />
+                                                <input type="hidden" name="cboCategory" value="${cboCategory}" />
+                                                <input type="hidden" name="cboStatus" value="${dto.status}" />
+                                                <input type="hidden" name="updateDetail" value="false" />
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <c:set var="listStatus" value="${applicationScope.STATUS_LIST}"/>
+                                            <form action="DispatchServlet">
+                                                <c:if test="${not empty listStatus}">
+                                                    <select name="cboStatus" class="form-control">
+                                                        <c:if test="${not empty listStatus}">
+                                                            <c:forEach var="status" items="${listStatus}" varStatus="counter">
+                                                                <option value="${status}"
+                                                                        <c:if test="${status == dto.status}">
+                                                                            selected
+                                                                        </c:if>
+                                                                        >${status}</option>
+                                                            </c:forEach>
+                                                        </c:if>
+                                                    </select>
+                                                </c:if>
+                                                <input type="submit" value="Update" name="btnAction" class="btn btn-warning form-control"/>
+                                                <input type="hidden" name="productID" value="${dto.productID}" />
+                                                <input type="hidden" name="cboCategory" value="${dto.cdto.categoryName}" />
+                                                <input type="hidden" name="cboStatus" value="${cboStatus}" />
+                                                <input type="hidden" name="updateDetail" value="false" />
+                                            </form>
+                                        </td>
+                                        <td
+                                            >${dto.quantity}
+                                        </td>
+                                        <td>
+                                            <c:url var="updateDetail" value="DispatchServlet">
+                                                <c:param name="btnAction" value="Update Detail"/>
+                                                <c:param name="productID" value="${dto.productID}"/>
+                                            </c:url>
+                                            <a href="${updateDetail}" class="btn btn-warning form-control" >Update Detail</a>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </c:if>
+                        </tbody>
+                    </table>
+                    <nav aria-label="Page navigation example">
+                        <c:set var="pageNo" value="${requestScope.PAGENO}"/>                   
+                        <c:set var="pageMaxAdmin" value="${requestScope.PAGE_MAX_ADMIN}"/>
+                        <c:if test="${pageMaxAdmin > 1}">
+                            <form action="DispatchServlet">
+                                <ul class="pagination justify-content-end">
+                                    <c:if test="${pageNo <= 1}">
+                                        <li class="page-item disabled">
+                                            <input type="submit" value="Previous" name="btnAction" class="page-link"/>
+                                        </li>   
+                                    </c:if>
+                                    <c:if test="${pageNo > 1}">
+                                        <li class="page-item">
+                                            <input type="submit" value="Previous" name="btnAction" class="page-link"/>
+                                        </li>   
+                                    </c:if>
+                                    <c:if test="${pageNo < pageMaxAdmin}">
+                                        <li class="page-item">
+                                            <input type="submit" value="Next" name="btnAction" class="page-link"/>
+                                        </li>   
+                                    </c:if>   
+                                    <c:if test="${pageNo == pageMaxAdmin}">
+                                        <li class="page-item disabled">
+                                            <input type="submit" value="Next" name="btnAction" class="page-link"/>
+                                        </li>   
+                                    </c:if>
+                                    <input type="hidden" name="pageNo" value="${pageNo}" />
+                                    <input type="hidden" name="pageView" value="searchProductByAdmin.jsp" />
+                                    <input type="hidden" name="txtSearchValue" value="${param.txtSearchValue}" />
+                                    <input type="hidden" name="cboCategory" value="${param.cboCategory}" />
+                                    <input type="hidden" name="txtPriceMin" value="${param.txtPriceMin}" />
+                                    <input type="hidden" name="txtPriceMax" value="${param.txtPriceMax}" />
+                                </ul>
+                            </form>
                         </c:if>
-                    </tbody>
-                </table>
-                <nav aria-label="Page navigation example">
-                    <c:set var="pageNo" value="${requestScope.PAGENO}"/>                   
-                    <c:set var="pageMaxAdmin" value="${requestScope.PAGE_MAX_ADMIN}"/>
-                    <c:if test="${pageMaxAdmin > 1}">
-                        <form action="DispatchServlet">
-                            <ul class="pagination justify-content-end">
-                                <c:if test="${pageNo <= 1}">
-                                    <li class="page-item disabled">
-                                        <input type="submit" value="Previous" name="btnAction" class="page-link"/>
-                                    </li>   
-                                </c:if>
-                                <c:if test="${pageNo > 1}">
-                                    <li class="page-item">
-                                        <input type="submit" value="Previous" name="btnAction" class="page-link"/>
-                                    </li>   
-                                </c:if>
-                                <c:if test="${pageNo < pageMaxAdmin}">
-                                    <li class="page-item">
-                                        <input type="submit" value="Next" name="btnAction" class="page-link"/>
-                                    </li>   
-                                </c:if>   
-                                <c:if test="${pageNo == pageMaxAdmin}">
-                                    <li class="page-item disabled">
-                                        <input type="submit" value="Next" name="btnAction" class="page-link"/>
-                                    </li>   
-                                </c:if>
-                                <input type="hidden" name="pageNo" value="${pageNo}" />
-                                <input type="hidden" name="pageView" value="searchProductByAdmin.jsp" />
-                                <input type="hidden" name="txtSearchValue" value="${param.txtSearchValue}" />
-                                <input type="hidden" name="cboCategory" value="${param.cboCategory}" />
-                                <input type="hidden" name="txtPriceMin" value="${param.txtPriceMin}" />
-                                <input type="hidden" name="txtPriceMax" value="${param.txtPriceMax}" />
-                            </ul>
-                        </form>
-                    </c:if>
-                </nav>
-            </c:if>
-            <c:if test="${empty productList}">
-                <h2 class="text-center"
-                    >
+                    </nav>
+                </c:if>
+                <c:if test="${empty productList}">
+                    <h2 class="text-center"
+                        >
                         No products
-                </h2>
+                    </h2>
+                </c:if>
+            </c:if>
+            <c:if test="${role == 'false' or empty role}">
+                <h1 class="text-center">OPPS, ACCESS DENIED</h1>
+                <p class="text-center">You don’t have permission to access on this page</p>
+                <c:url var="home" value="DispatchServlet">
+                    <c:param name="btnAction" value=""/>
+                </c:url>
+                <div class="text-center">
+                    <a href="${home}" class="btn btn-danger">Back To Home Page</a>
+                </div>
             </c:if>
         </div>
 
