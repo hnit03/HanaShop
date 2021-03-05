@@ -1,13 +1,13 @@
 # HanaShop
 
-##Background
+###Background
   Hana shop is an online shop selling drinks/fast food.
 
-##Program Specifications
+###Program Specifications
   Build a website that sells foods: coffee, cakes, candies, ... The website supports online payment or cash payment
   upon delivery. You must use Servlet as Controller and follow MVC2 model.
   
-##Features:
+###Features:
   This system contains the following functions:
   - Function 1: Login – 50 Points
   o In order to shopping, an authentication is required.
