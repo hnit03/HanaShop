@@ -65,3 +65,9 @@
   - Function 10: Product recommendation – 100 points (extra)
   o Suggest products that are often purchased together.
   o Suggest products according to customers' preferences.
+  
+  ## Connect me via
+1. [Facebook](https://www.facebook.com/heathcliff2k)
+2. [Email](mailto:hoangnhinguyen33@gmail.com)
+
+#### © 2021 by hnit03
